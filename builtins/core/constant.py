@@ -1,8 +1,7 @@
 from typing import Union, Any
 
 from . import logger
-from .valued_obj import ValuedObj
-from .user_obj import UserObj
+from . import ValuedObj, UserObj
 class Constant(ValuedObj):
 	''' A class representing a mathematical constant, such as '4' or 'pi'
 
@@ -51,6 +50,14 @@ class UserConstant(UserObj, Constant):
 			None
 		'''
 		super().__init__(value = value)
+
+	def __repr__(self):
+		''' Returns the string defined by gen_repr with the varg 'value'. '''
+		return self.gen_repr(self.value)
+
+
+
+
 
 
 

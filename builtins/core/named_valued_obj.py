@@ -1,6 +1,5 @@
 from . import logger
-from .named_obj import NamedObj
-from .valued_obj import ValuedObj
+from . import NamedObj, ValuedObj
 
 class NamedValuedObj(NamedObj, ValuedObj):
 
@@ -16,10 +15,10 @@ class NamedValuedObj(NamedObj, ValuedObj):
 
 		if __debug__:
 			assert not self.isknown()
-
-		return super().__str__(self)
+		assert True #assert super() type is NamedObj
+		return super().__str__()
 
 	def __repr__(self) -> str:
-		''' Returns the string defined by gen_repr(name, value) '''
+		''' Returns the string defined by gen_repr with kwargs 'name' and 'value'. '''
 		return self.gen_repr(name  = (self.name, self.DEFAULT_NAME),
 							 value = (self.value, self.DEFAULT_VALUE))

@@ -1,7 +1,7 @@
 from typing import Union, Any, Generic, TypeVar
 
 from . import logger
-from .math_obj import MathObj
+from . import MathObj
 
 T = TypeVar('T')
 
@@ -66,7 +66,7 @@ class NamedObj(MathObj, Generic[T]):
 		return super().__str__()
 
 	def __repr__(self) -> str:
-		''' Returns the string defined by gen_repr(name) '''
+		''' Returns the string defined by gen_repr with the kwarg 'name'. '''
 		return self.gen_repr(name = (self.name, self.DEFAULT_NAME))
 
 

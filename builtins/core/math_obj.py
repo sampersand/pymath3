@@ -1,5 +1,5 @@
-from . import logger
 from typing import Tuple, Any, Union
+from . import logger
 class MathObj():
 	'''
 	Base class for all PyMath Objects.
@@ -72,7 +72,7 @@ class MathObj():
 		return '{}({}{}{})'.format(cls.__qualname__, args_str, comma, kwargs_str)
 	
 	def __repr__(self) -> str:
-		''' Returns the string defined by self.gen_repr() '''
+		''' Returns the string defined by gen_repr with no args. '''
 		return self.gen_repr()
 
 
