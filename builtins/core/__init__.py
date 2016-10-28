@@ -1,16 +1,7 @@
 import logging
 logger = logging.getLogger(__name__)
 
-
-# from .property_meta import PropertyMeta
-from .math_obj import MathObj
-from .user_obj import UserObj
-
-from .named_obj import NamedObj
-from .valued_obj import ValuedObj
-from .named_valued_obj import NamedValuedObj
-
-from .constant import Constant, UserConstant
-from .variable import Variable, UserVariable
+from .constant import UserConstant; const = UserConstant
+from .variable import UserVariable; var = UserVariable
 
 __all__ = [x for x in list(locals()) if x[0] != '_']

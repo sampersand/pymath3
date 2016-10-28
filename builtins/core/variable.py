@@ -1,9 +1,10 @@
 from . import logger
-from . import NamedValuedObj, UserObj
+from .named_valued_obj import NamedValuedObj
+from .user_obj import UserObj
 class Variable(NamedValuedObj):
 	pass
 class UserVariable(UserObj, Variable):
-	def __init__(self, name = Variable.DEFAULT_NAME, value = Variable.DEFAULT_VALUE):
+	def __init__(self, name = Variable.defaults.name, value = Variable.defaults.value):
 		'''
 		'''
 		return super().__init__(name = name, value = value)
@@ -14,5 +15,5 @@ class UserVariable(UserObj, Variable):
 		elif self.hasname():
 			return self.gen_repr(self.name)
 		else:
-			return self.gen_repr(value = (self.value, self.DEFAULT_VALUE))
+			return self.gen_repr(value = (self.value, self.defaults.value))
 

@@ -1,6 +1,8 @@
 from typing import Tuple, Any, Union
 from . import logger
-class MathObj():
+
+from .default_meta import DefaultMeta
+class MathObj(metaclass=DefaultMeta):
 	'''
 	Base class for all PyMath Objects.
 
@@ -55,7 +57,7 @@ class MathObj():
 		if __debug__:
 			assert type(vargs) == tuple, 'python should make *vargs a tuple by default'
 			assert type(kwargs) == dict, 'python should make **kwargs a dict by default'
-			from . import UserObj
+			from .user_obj import UserObj
 			if vargs and not issubclass(cls, UserObj):
 				logger.warning('*vargs passed to gen_repr for non-UserObj type {}'.format(cls))
 			for key, value in kwargs.items():

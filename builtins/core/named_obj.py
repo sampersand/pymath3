@@ -1,11 +1,11 @@
 from typing import Union, Any, Generic, TypeVar
 
 from . import logger
-from . import MathObj
+from .math_obj import MathObj
 
 T = TypeVar('T')
 
-class NamedObj(MathObj, Generic[T]):
+class NamedObj(MathObj):#, Generic[T]):
 	''' Represents an object that can have a name.
 
 	This class is meant to be subclassed, and shouldn't be instanced directly.

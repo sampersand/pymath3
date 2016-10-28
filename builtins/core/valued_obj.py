@@ -1,11 +1,11 @@
 from typing import Union, Any, Generic, TypeVar
 
 from . import logger
-from . import MathObj
+from .operable import Operable
 
 T = TypeVar('T')
 
-class ValuedObj(MathObj, Generic[T]):
+class ValuedObj(Operable):#, Generic[T]):
 	''' Represents an object that can have a value.
 
 	This class is meant to be subclassed, and shouldn't be instanced directly.

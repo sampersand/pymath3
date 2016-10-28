@@ -1,7 +1,8 @@
 from typing import Union, Any
 
 from . import logger
-from . import ValuedObj, UserObj
+from .valued_obj import ValuedObj
+from .user_obj import UserObj
 class Constant(ValuedObj):
 	''' A class representing a mathematical constant, such as '4' or 'pi'
 
@@ -11,26 +12,26 @@ class Constant(ValuedObj):
 	'''
 
 	DEFAULT_VALUE = 0
-	ALLOWED_TYPE_VALUES = (int, float, bool, complex)
+	DEFAULT_ALLOWED_TYPES = (int, float, bool, complex)
 
 	def __init__(self,
-				value: ALLOWED_TYPE_VALUES = DEFAULT_VALUE,
+				value: DEFAULT_ALLOWED_TYPES = DEFAULT_VALUE,
 				**kwargs: Union[Any, Any]) -> None:
 		''' Instantiates self.
 
-		If value is not of ALLOWED_TYPE_VALUES, a warning will be logged.
+		If value is not of DEFAULT_ALLOWED_TYPES, a warning will be logged.
 
 		Arguments:
-			value    -- The value of this class. (default: Constant.DEFAULT_VALUE)
+			value    -- The value of this class. (defaults: Constant.DEFAULT_VALUE)
 			**kwargs -- Extra kwargs, will be ignored for this class.
 		Returns:
 			None
 		'''
 
-		if not isinstance(value, self.ALLOWED_TYPE_VALUES):
+		if not isinstance(value, self.DEFAULT_ALLOWED_TYPES):
 			logger.warning('Recieved invalid type for value: {}. Allowed types: {}'.format(
 				type(value),
-				self.ALLOWED_TYPE_VALUES))
+				self.DEFAULT_ALLOWED_TYPES))
 		super().__init__(value = value, **kwargs)
 class UserConstant(UserObj, Constant):
 	''' The user class for Constant.
@@ -39,13 +40,13 @@ class UserConstant(UserObj, Constant):
 	pass keywords to the constructor) but shouldn't be used when robustness is necessary.
 	'''
 
-	def __init__(self, value: Constant.ALLOWED_TYPE_VALUES = Constant.DEFAULT_VALUE) -> None:
+	def __init__(self, value: Constant.DEFAULT_ALLOWED_TYPES = Constant.DEFAULT_VALUE) -> None:
 		''' Initiates self.
 		
 		This function passes 'value' to Constant's constructor, and nothing else.
 
 		Arguments:
-			value -- The value of this class. (default: Constant.DEFAULT_VALUE)
+			value -- The value of this class. (defaults: Constant.DEFAULT_VALUE)
 		Returns:
 			None
 		'''

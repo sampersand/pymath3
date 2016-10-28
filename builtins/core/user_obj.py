@@ -1,4 +1,4 @@
-from . import MathObj
+from .math_obj import MathObj
 class UserObj(MathObj):
 	'''
 	Base class for all objects that should be directly instanced by the user.

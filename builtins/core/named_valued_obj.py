@@ -1,7 +1,32 @@
+from typing import Any
+
 from . import logger
-from . import NamedObj, ValuedObj
+from .named_obj import NamedObj
+from .valued_obj import ValuedObj
 
 class NamedValuedObj(NamedObj, ValuedObj):
+	''' Represents an object that can have both a name and a value.
+
+	This class is meant to be subclassed, and shouldn't be instanced directly.
+
+	If attempting to directly instantiate a NamedValuedObj, a warning will be logged.
+	'''
+
+
+	def __init__(self, **kwargs: Any) -> None:
+		''' Initializes self 
+		
+		If attempting to directly instantiate a NamedValuedObj, a warning will be logged.
+
+		Arguments:
+			**kwargs -- Extra kwargs, will be ignored for this class.
+		'''
+
+		if __debug__:
+			if type(self) == NamedValuedObj:
+				logger.warning("Should not instantiate {} directly!".format(type(self).__qualname__))
+		super().__init__(**kwargs)
+
 
 	def __str__(self) -> str:
 		''' Returns a string representation of this class.
