@@ -1,8 +1,8 @@
 from . import logger
-from . import NamedValuedObj
+from . import NamedValuedObj, UserObj
 class Variable(NamedValuedObj):
 	pass
-class UserVariable(Variable):
+class UserVariable(UserObj, Variable):
 	def __init__(self, name = Variable.DEFAULT_NAME, value = Variable.DEFAULT_VALUE):
 		'''
 		'''
