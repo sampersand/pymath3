@@ -1,9 +1,28 @@
 from . import logger
 from typing import Tuple, Any, Union
 class MathObj():
-	def __init__(self, *args: Any, **kwargs: Union[Any, Any]) -> None:
-		if args:
-			logger.warning("Class type {} is using *args!".format(type(self).__qualname__))
+	'''
+	Base class for all PyMath Objects.
+
+	If attempting to directly instantiate a ValuedObj, a warning will be logged.
+	'''
+
+	def __init__(self, **kwargs: Union[Any, Any]) -> None:
+		''' Instantiates self.
+
+		If attempting to directly instantiate a MathObj, a warning will be logged.
+
+		Arguments:
+			**kwargs -- Extra kwargs, will be ignored for this class.
+		Returns:
+			None
+		'''
+
+		if __debug__:
+			# if args:
+			# 	logger.warning("Class type {} is using *args!".format(type(self).__qualname__))
+			if type(self) == MathObj:
+				logger.warning("Should not instantiate {} directly!".format(type(self).__qualname__))
 		super().__init__(**kwargs)
 
 	@classmethod
@@ -32,6 +51,7 @@ class MathObj():
 		Returns:
 			A string representation of 'cls' built from the passed *vargs and **kwargs.
 		'''
+
 		if __debug__:
 			assert type(vargs) == tuple, 'python should make *vargs a tuple by default'
 			assert type(kwargs) == dict, 'python should make **kwargs a dict by default'
@@ -41,16 +61,19 @@ class MathObj():
 			for key, value in kwargs.items():
 				if not isinstance(value, (list, tuple)) or len(value) != 2:
 					logger.warning("Value isn't (given, default), but {}".format(value))
+
 		args_str = ', '.join(str(arg) for arg in vargs)
 		kwargs_str = {}
 		for key, (given, default) in kwargs.items():
 			if given != default: #should it be 'is not'?
 				kwargs_str[key] = given
 		kwargs_str = ', '.join('='.join((str(x[0]), str(x[1]))) for x in kwargs_str.items())
-		return '{}({}{}{})'.format(cls.__qualname__,
-			args_str,
-			', ' if args_str and kwargs else '',
-			kwargs_str)
+		comma = ', ' if args_str and kwargs else ''
+		return '{}({}{}{})'.format(cls.__qualname__, args_str, comma, kwargs_str)
 	
 	def __repr__(self) -> str:
+		''' Returns the string defined by self.gen_repr() '''
 		return self.gen_repr()
+
+
+
