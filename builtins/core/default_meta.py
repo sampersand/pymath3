@@ -2,23 +2,9 @@ import collections
 # from . import logger
 
 
-class _stand_in_for_attr():
-	def __init__(self, attr_name):
-		self.attr_name = attr_name
-
-	def __get__(self, instance, parent):
-		if instance == None:
-			logger.warning('Trying to get the standin attr {} without an instance!'.format(self.attr_name))
-		return instance[self.attr_name]
-
-	def __call__(self, *args, **kwargs):
-		#idk why this is being called.....
-		return self
-
-	def __repr__(self):
-		return '<standin for {}>'.format(self.attr_name)
-
 class defaults_dict(dict):
+	__slots__ = ()
+
 	def __init__(self):
 		super().__init__()
 		super().__setattr__('_islocked', False)
@@ -73,6 +59,7 @@ class DefaultMeta(type):
 		cls.defaults.acquire()
 
 		cls.isdefault = cls._static_isdefault
+		cls.make_default = cls._static_make_default
 	def _create_defaults(self):
 		for ele_name in dir(self):
 			assert hasattr(self, ele_name)
@@ -105,7 +92,25 @@ class DefaultMeta(type):
 	def _getattr(meta_inst_inst, name):
 		return getattr(meta_inst_inst, name)
 
-class UnderscoreDefaultMeta(DefaultMeta):
+	@staticmethod
+	def _static_make_default(self, *args):
+		for argname in args:
+			setattr(self, argname, getattr(self.defaults, argname))
+
+class DefaultUnderscoredMeta(DefaultMeta):
+	__slots__ = ()
+
 	@staticmethod
 	def _getattr(meta_inst_inst, name):
 		return getattr(meta_inst_inst, '_' + name)
+
+	@staticmethod
+	def _static_make_default(self, *args):
+		for argname in args:
+			setattr(self, '_' + argname, getattr(self.defaults, argname))
+
+
+
+
+
+

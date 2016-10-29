@@ -1,8 +1,7 @@
 from typing import Tuple, Any, Union
 from . import logger
 
-from .default_meta import DefaultMeta
-class MathObj(metaclass=DefaultMeta):
+class MathObj():
 	'''
 	Base class for all PyMath Objects.
 
@@ -76,5 +75,5 @@ class MathObj(metaclass=DefaultMeta):
 		''' Returns the string defined by gen_repr with no args. '''
 		return self.gen_repr()
 
-
+	__slots__ = ()
 

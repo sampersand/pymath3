@@ -4,8 +4,8 @@ from . import logger
 from .math_obj import MathObj
 
 T = TypeVar('T')
-
-class NamedObj(MathObj):#, Generic[T]):
+from .default_meta import DefaultUnderscoredMeta
+class NamedObj(MathObj, metaclass=DefaultUnderscoredMeta):#, Generic[T]):
 	''' Represents an object that can have a name.
 
 	This class is meant to be subclassed, and shouldn't be instanced directly.
@@ -17,7 +17,9 @@ class NamedObj(MathObj):#, Generic[T]):
 
 	DEFAULT_NAME = None
 
-	def __init__(self, name: Union[T, type(DEFAULT_NAME)] = DEFAULT_NAME, **kwargs: Any) -> None:
+	def __init__(self, name: Union[T, 'type(defaults.name)'] = None, **kwargs: Any) -> None:
+		if name == None:
+			name = self.defaults.name
 		''' Initializes self with 'name'
 		
 		If attempting to directly instantiate a NamedObj, a warning will be logged.
