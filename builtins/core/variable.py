@@ -4,7 +4,7 @@ from .user_obj import UserObj
 class Variable(NamedValuedObj):
 	pass
 class UserVariable(UserObj, Variable):
-	def __init__(self, name = Variable.defaults.name, value = Variable.defaults.value):
+	def __init__(self, name = 'Variable.defaults.name', value = 'Variable.defaults.value'):
 		'''
 		'''
 		return super().__init__(name = name, value = value)
