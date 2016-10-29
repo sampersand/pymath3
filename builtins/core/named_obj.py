@@ -27,9 +27,8 @@ class NamedObj(MathObj):#, Generic[T]):
 			**kwargs -- Extra kwargs, will be ignored for this class.
 		'''
 
-		if __debug__:
-			if type(self) == NamedObj:
-				logger.warning("Should not instantiate {} directly!".format(type(self).__qualname__))
+		if __debug__ and type(self) == NamedObj:
+			logger.warning("Should not instantiate {} directly!".format(type(self).__qualname__))
 		self.name = name
 		super().__init__(**kwargs)
 
@@ -61,8 +60,9 @@ class NamedObj(MathObj):#, Generic[T]):
 		'''
 		if self.hasname():
 			return str(self.name)
-		if __debug__:
-			assert not self.hasname()
+
+		assert __debug__ or not self.hasname()
+
 		return super().__str__()
 
 	def __repr__(self) -> str:

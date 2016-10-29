@@ -22,9 +22,8 @@ class NamedValuedObj(NamedObj, ValuedObj):
 			**kwargs -- Extra kwargs, will be ignored for this class.
 		'''
 
-		if __debug__:
-			if type(self) == NamedValuedObj:
-				logger.warning("Should not instantiate {} directly!".format(type(self).__qualname__))
+		if __debug__ and type(self) == NamedValuedObj:
+			logger.warning("Should not instantiate {} directly!".format(type(self).__qualname__))
 		super().__init__(**kwargs)
 
 
@@ -38,9 +37,9 @@ class NamedValuedObj(NamedObj, ValuedObj):
 		if self.isknown():
 			return ValuedObj.__str__(self)
 
-		if __debug__:
-			assert not self.isknown()
+		assert not self.isknown()
 		assert True #assert super() type is NamedObj
+
 		return super().__str__()
 
 	def __repr__(self) -> str:

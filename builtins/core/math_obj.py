@@ -20,11 +20,10 @@ class MathObj(metaclass=DefaultMeta):
 			None
 		'''
 
-		if __debug__:
-			# if args:
-			# 	logger.warning("Class type {} is using *args!".format(type(self).__qualname__))
-			if type(self) == MathObj:
-				logger.warning("Should not instantiate {} directly!".format(type(self).__qualname__))
+		# if args:
+		# 	logger.warning("Class type {} is using *args!".format(type(self).__qualname__))
+		if __debug__ and type(self) == MathObj:
+			logger.warning("Should not instantiate {} directly!".format(type(self).__qualname__))
 		super().__init__(**kwargs)
 
 	@classmethod

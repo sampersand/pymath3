@@ -12,8 +12,7 @@
 # 	Returns:
 # 		cls
 # 	'''
-# 	if __debug__:
-# 		if not isinstance(cls, type):
+# 	if __debug__ and not isinstance(cls, type):
 # 			logger.warning('Attempting to declare a {} abstract'.frmat(cls))
 # 	cls._isabstract = True
 # 	return cls

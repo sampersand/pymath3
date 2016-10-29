@@ -27,9 +27,8 @@ class ValuedObj(Operable):#, Generic[T]):
 			**kwargs -- Extra kwargs, will be ignored for this class.
 		'''
 
-		if __debug__:
-			if type(self) == ValuedObj:
-				logger.warning("Should not instantiate {} directly!".format(type(self).__qualname__))
+		if __debug__ and type(self) == ValuedObj:
+			logger.warning("Should not instantiate {} directly!".format(type(self).__qualname__))
 		self.value = value
 
 		super().__init__(**kwargs)
@@ -62,8 +61,9 @@ class ValuedObj(Operable):#, Generic[T]):
 		'''
 		if self.isknown():
 			return str(self.value)
-		if __debug__:
-			assert not self.isknown()
+
+		assert not self.isknown()
+
 		return super().__str__()
 
 	def __repr__(self) -> str:
