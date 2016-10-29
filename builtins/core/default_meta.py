@@ -77,7 +77,7 @@ class DefaultMeta(type):
 		for ele_name in dir(self):
 			assert hasattr(self, ele_name)
 			if ele_name.startswith('DEFAULT_'):
-				self.defaults[ele_name[len('DEFAULT_'):]] = getattr(self, ele_name)
+				self.defaults[ele_name[len('DEFAULT_'):].lower()] = getattr(self, ele_name)
 				delattr(self, ele_name)
 
 	def _update_defaults(self, bases):
@@ -109,27 +109,3 @@ class UnderscoreDefaultMeta(DefaultMeta):
 	@staticmethod
 	def _getattr(meta_inst_inst, name):
 		return getattr(meta_inst_inst, '_' + name)
-
-class foo(metaclass=UnderscoreDefaultMeta):
-	DEFAULT_x = 4
-	DEFAULT_y = 4
-	def __init__(self, x = None):
-		if x is None:
-			x = self.defaults.x
-		self._x = x
-	__slots__ = ('_x', )
-f = foo()
-print(f.isdefault('x'), f.defaults['x'], f._x)
-
-
-
-
-
-
-
-
-
-
-
-
-
