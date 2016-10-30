@@ -16,6 +16,7 @@ class UnseededFunction(NamedObj):
 	__update_defaults__(__this_defaults__, __defaults__) # just to be explicit
 	print(__defaults__, __defaults__.func_arglen)
 
+
 	def __init__(self,
 			base_func: Union[BASE_FUNC_TYPE, __defaults__.base_func] = None,
 			func_strs: Union[Dict[AnyStr, AnyStr], __defaults__.func_strs] = None,
