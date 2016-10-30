@@ -1,13 +1,13 @@
 from typing import Tuple, Any, Union
 from . import logger
-
-class MathObj():
+from pymath3.utils.default_obj import DefaultObj
+class MathObj(metaclass=DefaultObj):
 	'''
 	Base class for all PyMath Objects.
 
 	If attempting to directly instantiate a ValuedObj, a warning will be logged.
 	'''
-
+	_DEFAULTS = {}
 	def __init__(self, **kwargs: Union[Any, Any]) -> None:
 		''' Instantiates self.
 

@@ -4,8 +4,7 @@ from . import logger
 from .math_obj import MathObj
 
 T = TypeVar('T')
-from .default_meta import DefaultUnderscoredMeta
-class NamedObj(MathObj, metaclass=DefaultUnderscoredMeta):#, Generic[T]):
+class NamedObj(MathObj):#, Generic[T]):
 	''' Represents an object that can have a name.
 
 	This class is meant to be subclassed, and shouldn't be instanced directly.
@@ -14,10 +13,13 @@ class NamedObj(MathObj, metaclass=DefaultUnderscoredMeta):#, Generic[T]):
 	
 	If attempting to directly instantiate a NamedObj, a warning will be logged.
 	'''
+	_DEFAULTS = MathObj._DEFAULTS + {
+		'name': None,
+	}
 
-	DEFAULT_NAME = None
-
-	def __init__(self, name: Union[T, 'defaults.name'] = None, **kwargs: Any) -> None:
+	def __init__(self,
+		name: Union[T, _DEFAULTS.name] = _DEFAULTS.name,
+		**kwargs: Any) -> None:
 		''' Initializes self with 'name'
 		
 		If attempting to directly instantiate a NamedObj, a warning will be logged.
@@ -27,18 +29,17 @@ class NamedObj(MathObj, metaclass=DefaultUnderscoredMeta):#, Generic[T]):
 			**kwargs -- Extra kwargs, will be ignored for this class.
 		'''
 
-		self.set_values(name = name)
-
 		if __debug__ and type(self) == NamedObj:
 			logger.warning("Should not instantiate {} directly!".format(type(self).__qualname__))
 
+		self.name = name
 		super().__init__(**kwargs)
 
 
 	name = property(doc = "The name of this class")
 
 	@name.getter
-	def name(self) -> Union[T, type(DEFAULT_NAME)]:
+	def name(self) -> Union[T, type(_DEAULTS.name)]:
 		return self._name
 
 	@name.setter
@@ -47,11 +48,11 @@ class NamedObj(MathObj, metaclass=DefaultUnderscoredMeta):#, Generic[T]):
 
 	@name.deleter
 	def name(self) -> None:
-		self._name = self.DEFAULT_NAME
+		self._name = self._DEAULTS.name
 
 	def hasname(self) -> bool:
 		''' Return true if this this class has a name. '''
-		return self.name != self.DEFAULT_NAME
+		return self.name != self._DEAULTS.name
 
 	def __str__(self) -> str:
 		''' Returns a string representation of this class.
@@ -69,7 +70,7 @@ class NamedObj(MathObj, metaclass=DefaultUnderscoredMeta):#, Generic[T]):
 
 	def __repr__(self) -> str:
 		''' Returns the string defined by gen_repr with the kwarg 'name'. '''
-		return self.gen_repr(name = (self.name, self.DEFAULT_NAME))
+		return self.gen_repr(name = (self.name, self._DEAULTS.name))
 
 
 
