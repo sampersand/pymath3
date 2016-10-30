@@ -17,9 +17,7 @@ class NamedObj(MathObj, metaclass=DefaultUnderscoredMeta):#, Generic[T]):
 
 	DEFAULT_NAME = None
 
-	def __init__(self, name: Union[T, 'type(defaults.name)'] = None, **kwargs: Any) -> None:
-		if name == None:
-			name = self.defaults.name
+	def __init__(self, name: Union[T, 'defaults.name'] = None, **kwargs: Any) -> None:
 		''' Initializes self with 'name'
 		
 		If attempting to directly instantiate a NamedObj, a warning will be logged.
@@ -29,9 +27,11 @@ class NamedObj(MathObj, metaclass=DefaultUnderscoredMeta):#, Generic[T]):
 			**kwargs -- Extra kwargs, will be ignored for this class.
 		'''
 
+		self.set_values(name = name)
+
 		if __debug__ and type(self) == NamedObj:
 			logger.warning("Should not instantiate {} directly!".format(type(self).__qualname__))
-		self.name = name
+
 		super().__init__(**kwargs)
 
 
