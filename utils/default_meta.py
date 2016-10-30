@@ -1,3 +1,4 @@
+from . import logger
 from inspect import stack
 
 def _get_var_from_stack(varname, stack_level):
@@ -10,11 +11,40 @@ def _get_var_from_stack(varname, stack_level):
 			frame_info.code_context[0], stack_level))
 
 	return f_locals[varname]
-class _attr_dict(dict):
-	def __getattr__(self, attr):
-		if attr not in self:
+class _DefaultDict(dict):
+	__slots__ = ('_updated_dicts', '_parent_name')
+
+	def __init__(self, parent_name):
+		super().__init__()
+		self._updated_dicts = []
+		self._parent_name = parent_name
+
+	def __getitem__(self, item):
+		if item not in self:
 			self.update(_get_var_from_stack('__this_defaults__', -2))
+		return super().__getitem__(item)
+
+
+	def update(self, other):
+		if not isinstance(other, dict):
+			raise TypeError('Cannot update type {} with a non-dict type'.format(type(self)))
+		if other in self._updated_dicts:
+			logger.debug("Attempted to update {}'s __defaults__ with the dictionary '{}' more than once.".format(
+				self._parent_name, other))
+	
+		self._updated_dicts.append(other)
+		ret = super().update(other)
+
+	def __getattr__(self, attr):
 		return self[attr]
+
+
+def __update_defaults__(this_defaults, defaults = None, stack_level = -1):
+	if defaults is None:
+		defaults = _get_var_from_stack('__defaults__', stack_level)
+
+	defaults.update(this_defaults)
+
 
 class DefaultMeta(type):
 	''' A Meta-class that standardizes default values
@@ -26,12 +56,11 @@ class DefaultMeta(type):
 
 		class Foo(metaclass=DefaultMeta):
 			__this_defaults__ = {'spam': 'eggs', 'ham': True}
-
 			def __init__(self, spam = __defaults__.spam, ham = __defaults__.ham):
 				...
 
 	By default, '__defaults__' is an empty dict. If the parent classes have the '__defaults__'
-	attribute defined, all such '__default__'s are combined together
+	attribute defined, all such '__defaults__'s are combined together
 
 	Children will also take on all the defaults of their parents.
 
@@ -42,35 +71,45 @@ class DefaultMeta(type):
 			def __init__(self, spam = __defaults__.spam, toast = __defaults__.toast):
 				...
 
+	The mere declaration of '__this_defaults__' does not ensure that it is added to '__defaults__',
+	however there are a few ways to ensure it does.
+		1. Explitictly, via the '__update_defaults__' method.
+	
+			class Car(metaclass=DefaultMeta)
+				__this_defaults__ = {'colour': 'red'}
+				__update_defaults__(__this_defaults__)
+		
+		2. Implicitly by either getting an attribute or an item from __defaults__ that isn't defined
+			Note: This will cause '__this_defaults__' to be imported regardless of whether or not
+				  the item in question exists in '__this_defaults__' or '__defaults__'.
+
+		3. At the end of the class creation, if '__defaults__' isn't used.
+
 	Note: This also works with annotations!
 	'''
 	@classmethod
 	def __prepare__(metacls, name, bases, **kwargs):
 		ret = super().__prepare__(metacls, name, bases, **kwargs)
 
-		__defaults__ = _attr_dict()
+		__defaults__ = _DefaultDict(parent_name = name)
 
 		for base in bases:
 			if hasattr(base, '__defaults__'):
 				__defaults__.update(base.__defaults__)
 
 		ret['__defaults__'] = __defaults__
-		ret['__update_defaults__'] = metacls._static__update_defaults__
+		ret['__update_defaults__'] = __update_defaults__
 		return ret
-
-	@staticmethod
-	def _static__update_defaults__(__this_defaults__, __defaults__ = None, stack_level = -2):
-		if __defaults__ is None:
-			__defaults__ = _get_var_from_stack('__defaults__', stack_level)
-
-		__defaults__.update(__this_defaults__)
-
 
 	def __init__(cls, name, bases, attrs, **kwargs):
 		type.__init__(cls, name, bases, attrs, **kwargs)
 		if '__repr__' not in attrs:
 			cls.__repr__ = DefaultMeta._static__repr__
 
+		assert hasattr(cls, '__defaults__') # Should have been made in __prepare__
+
+		if hasattr(cls, '__this_defaults__') and cls.__this_defaults__ not in cls.__defaults__._updated_dicts:
+			cls.__defaults__.update(cls.__this_defaults__)
 	@staticmethod
 	def _static__repr__(self):
 		non_default_values = {}
@@ -81,29 +120,6 @@ class DefaultMeta(type):
 				non_default_values[name] = self_value
 		return '{}({})'.format(type(self).__qualname__,
 			', '.join('{}={!r}'.format(name, value) for name, value in non_default_values.items()))
-class Diner(metaclass=DefaultMeta):
-	__this_defaults__ = {'spam': 'eggs', 'ham': True}
-	__update_defaults__(__this_defaults__)
-	
-	def __init__(self, spam = __defaults__.spam, ham = __defaults__.ham):
-		self.spam = spam
-		self.ham = ham
-
-d = Diner(ham = False)
-print(repr(d))
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

@@ -13,12 +13,11 @@ class NamedObj(MathObj):#, Generic[T]):
 	
 	If attempting to directly instantiate a NamedObj, a warning will be logged.
 	'''
-	_DEFAULTS = MathObj._DEFAULTS + {
-		'name': None,
-	}
+	__this_defaults__ = {'name': None, }
+	__update_defaults__(__this_defaults__, __defaults__)
 
 	def __init__(self,
-		name: Union[T, _DEFAULTS.name] = _DEFAULTS.name,
+		name: Union[T, __defaults__.name] = __defaults__.name,
 		**kwargs: Any) -> None:
 		''' Initializes self with 'name'
 		
@@ -39,7 +38,7 @@ class NamedObj(MathObj):#, Generic[T]):
 	name = property(doc = "The name of this class")
 
 	@name.getter
-	def name(self) -> Union[T, type(_DEAULTS.name)]:
+	def name(self) -> Union[T, type(__defaults__.name)]:
 		return self._name
 
 	@name.setter
@@ -48,11 +47,11 @@ class NamedObj(MathObj):#, Generic[T]):
 
 	@name.deleter
 	def name(self) -> None:
-		self._name = self._DEAULTS.name
+		self._name = self.__defaults__.name
 
 	def hasname(self) -> bool:
 		''' Return true if this this class has a name. '''
-		return self.name != self._DEAULTS.name
+		return self.name != self.__defaults__.name
 
 	def __str__(self) -> str:
 		''' Returns a string representation of this class.
@@ -70,7 +69,7 @@ class NamedObj(MathObj):#, Generic[T]):
 
 	def __repr__(self) -> str:
 		''' Returns the string defined by gen_repr with the kwarg 'name'. '''
-		return self.gen_repr(name = (self.name, self._DEAULTS.name))
+		return self.gen_repr(name = (self.name, self.__defaults__.name))
 
 
 
