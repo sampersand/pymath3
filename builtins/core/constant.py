@@ -11,15 +11,20 @@ class Constant(ValuedObj):
 	robust.
 	'''
 
-	DEFAULT_VALUE = 0
-	DEFAULT_ALLOWED_TYPES = (int, float, bool, complex)
+	__this_defaults__ = {
+		'value': 0,
+		'allowed_types': (int, float, bool, complex)
+	}
+	__update_defaults__(__this_defaults__, __defaults__) # just to be explicit
+
+	__slots__ = __gen_slots__()
 
 	def __init__(self,
-				value: DEFAULT_ALLOWED_TYPES = DEFAULT_VALUE,
+				value: __defaults__.allowed_types = __defaults__.value,
 				**kwargs: Union[Any, Any]) -> None:
 		''' Instantiates self.
 
-		If value is not of DEFAULT_ALLOWED_TYPES, a warning will be logged.
+		If value is not of __defaults__.allowed_types, a warning will be logged.
 
 		Arguments:
 			value    -- The value of this class. (defaults: Constant.DEFAULT_VALUE)
@@ -28,11 +33,12 @@ class Constant(ValuedObj):
 			None
 		'''
 
-		if not isinstance(value, self.DEFAULT_ALLOWED_TYPES):
+		if not isinstance(value, self.__defaults__.allowed_types):
 			logger.warning('Recieved invalid type for value: {}. Allowed types: {}'.format(
 				type(value),
-				self.DEFAULT_ALLOWED_TYPES))
+				self.__defaults__.allowed_types))
 		super().__init__(value = value, **kwargs)
+
 class UserConstant(UserObj, Constant):
 	''' The user class for Constant.
 
@@ -40,13 +46,13 @@ class UserConstant(UserObj, Constant):
 	pass keywords to the constructor) but shouldn't be used when robustness is necessary.
 	'''
 
-	def __init__(self, value: Constant.DEFAULT_ALLOWED_TYPES = Constant.DEFAULT_VALUE) -> None:
+	def __init__(self, value: __defaults__.allowed_types = __defaults__.value) -> None:
 		''' Initiates self.
 		
 		This function passes 'value' to Constant's constructor, and nothing else.
 
 		Arguments:
-			value -- The value of this class. (defaults: Constant.DEFAULT_VALUE)
+			value -- The value of this class. (default: __defaults__.value)
 		Returns:
 			None
 		'''

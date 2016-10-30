@@ -13,8 +13,11 @@ class NamedObj(MathObj):#, Generic[T]):
 	
 	If attempting to directly instantiate a NamedObj, a warning will be logged.
 	'''
+
 	__this_defaults__ = {'name': None, }
-	__update_defaults__(__this_defaults__, __defaults__)
+	__update_defaults__(__this_defaults__, __defaults__) # just to be explicit
+
+	__slots__ = __gen_slots__()
 
 	def __init__(self,
 		name: Union[T, __defaults__.name] = __defaults__.name,

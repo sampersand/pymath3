@@ -11,8 +11,7 @@ class NamedValuedObj(NamedObj, ValuedObj):
 
 	If attempting to directly instantiate a NamedValuedObj, a warning will be logged.
 	'''
-
-
+	__slots__ = __gen_slots__()
 	def __init__(self, **kwargs: Any) -> None:
 		''' Initializes self 
 		

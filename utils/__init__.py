@@ -1,3 +1,4 @@
 import logging
 logger = logging.getLogger(__name__)
-from .abstract import *
+from .from_stack import from_stack
+from .default_meta import DefaultMeta

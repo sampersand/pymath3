@@ -15,15 +15,20 @@ class ValuedObj(Operable):#, Generic[T]):
 	If attempting to directly instantiate a ValuedObj, a warning will be logged.
 	'''
 
-	DEFAULT_VALUE = None
+	__this_defaults__ = {'value': None}
+	__update_defaults__(__this_defaults__, __defaults__) # just to be explicit
 
-	def __init__(self, value: Union[T, type(DEFAULT_VALUE)] = DEFAULT_VALUE, **kwargs: Any) -> None:
+	__slots__ = __gen_slots__()
+
+	def __init__(self,
+		value: Union[T, type(__defaults__.value)] = __defaults__.value,
+		**kwargs: Any) -> None:
 		''' Initializes self with 'value'
 		
 		If attempting to directly instantiate a ValuedObj, a warning will be logged.
 
 		Arguments:
-			value    -- The value of this class. (default: ValuedObj.DEFAULT_VALUE)
+			value    -- The value of this class. (default: ValuedObj.__defaults__.value)
 			**kwargs -- Extra kwargs, will be ignored for this class.
 		'''
 
@@ -37,7 +42,7 @@ class ValuedObj(Operable):#, Generic[T]):
 	value = property(doc = "The resulting value of this class")
 
 	@value.getter
-	def value(self) -> Union[T, type(DEFAULT_VALUE)]:
+	def value(self) -> Union[T, type(__defaults__.value)]:
 		return self._value
 
 	@value.setter
@@ -46,11 +51,11 @@ class ValuedObj(Operable):#, Generic[T]):
 
 	@value.deleter
 	def value(self) -> None:
-		self._value = self.DEFAULT_VALUE
+		self._value = self.__defaults__.value
 
 	def isknown(self) -> bool:
 		''' Return true if this this class has a value. '''
-		return self.value != self.DEFAULT_VALUE
+		return self.value != self.__defaults__.value
 
 	def __str__(self) -> str:
 		''' Returns a string representation of this class.
@@ -65,11 +70,6 @@ class ValuedObj(Operable):#, Generic[T]):
 		assert not self.isknown()
 
 		return super().__str__()
-
-	def __repr__(self) -> str:
-		''' Returns the string defined by gen_repr with the kwarg 'value'. '''
-		return self.gen_repr(value = (self.value, self.DEFAULT_VALUE))
-
 
 
 __all__ = ('ValuedObj', )

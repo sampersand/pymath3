@@ -1,12 +1,15 @@
 from typing import Tuple, Any, Union
 from . import logger
-from pymath3.utils.default_meta import DefaultMeta
-class MathObj(metaclass=DefaultMeta):
+from .math_meta import MathMeta
+class MathObj(metaclass=MathMeta):
 	'''
 	Base class for all PyMath Objects.
 
 	If attempting to directly instantiate a ValuedObj, a warning will be logged.
 	'''
+
+	__slots__ = __gen_slots__()
+
 	def __init__(self, **kwargs: Union[Any, Any]) -> None:
 		''' Instantiates self.
 
@@ -73,6 +76,4 @@ class MathObj(metaclass=DefaultMeta):
 	def __repr__(self) -> str:
 		''' Returns the string defined by gen_repr with no args. '''
 		return self.gen_repr()
-
-	__slots__ = ()
 
