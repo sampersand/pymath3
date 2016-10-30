@@ -1,27 +1,22 @@
-from . import logger
-from inspect import stack
+from . import logger, from_stack
 
-def _get_var_from_stack(varname, stack_level):
-	frame_info = stack()[stack_level]
-	f_locals = frame_info.frame.f_locals
-
-	if varname not in f_locals:
-		assert len(frame_info.code_context) == 1
-		raise AttributeError('Cannot findvarnameat context\n\n{}\n(level = {})'.format(
-			frame_info.code_context[0], stack_level))
-
-	return f_locals[varname]
 class _DefaultDict(dict):
-	__slots__ = ('_updated_dicts', '_parent_name')
+	__slots__ = ('_updated_dicts', '_parent', '_name')
 
-	def __init__(self, parent_name):
+	def __init__(self):
 		super().__init__()
 		self._updated_dicts = []
-		self._parent_name = parent_name
 
-	def __getitem__(self, item):
+	def __set_name__(self, parent, name):
+		self._parent = parent
+		self._name = name
+		return self
+
+	def __getitem__(self, item, stack_level = None):
 		if item not in self:
-			self.update(_get_var_from_stack('__this_defaults__', -2))
+			logger.debug("Item '{}' not in type {}, looking for it in __this_defaults__!".format(
+				item, type(self).__qualname__))
+			self.update(from_stack('__this_defaults__', stack_level or -2))
 		return super().__getitem__(item)
 
 
@@ -30,7 +25,7 @@ class _DefaultDict(dict):
 			raise TypeError('Cannot update type {} with a non-dict type'.format(type(self)))
 		if other in self._updated_dicts:
 			logger.debug("Attempted to update {}'s __defaults__ with the dictionary '{}' more than once.".format(
-				self._parent_name, other))
+				self._parent, other))
 	
 		self._updated_dicts.append(other)
 		ret = super().update(other)
@@ -41,7 +36,7 @@ class _DefaultDict(dict):
 
 def __update_defaults__(this_defaults, defaults = None, stack_level = -1):
 	if defaults is None:
-		defaults = _get_var_from_stack('__defaults__', stack_level)
+		defaults = from_stack('__defaults__', stack_level)
 
 	defaults.update(this_defaults)
 
@@ -87,11 +82,12 @@ class DefaultMeta(type):
 
 	Note: This also works with annotations!
 	'''
+	
 	@classmethod
 	def __prepare__(metacls, name, bases, **kwargs):
 		ret = super().__prepare__(metacls, name, bases, **kwargs)
 
-		__defaults__ = _DefaultDict(parent_name = name)
+		__defaults__ = _DefaultDict()
 
 		for base in bases:
 			if hasattr(base, '__defaults__'):
@@ -100,7 +96,10 @@ class DefaultMeta(type):
 		ret['__defaults__'] = __defaults__
 		ret['__update_defaults__'] = __update_defaults__
 		return ret
-
+	def __new__(cls, name, bases, attrs, **kwargs):
+		# print(cls, name, bases, attrs, kwargs)
+		# quit(attrs)
+		ret = super().__new__(cls, name, bases, attrs, **kwargs)
 	def __init__(cls, name, bases, attrs, **kwargs):
 		type.__init__(cls, name, bases, attrs, **kwargs)
 		if '__repr__' not in attrs:
@@ -110,6 +109,7 @@ class DefaultMeta(type):
 
 		if hasattr(cls, '__this_defaults__') and cls.__this_defaults__ not in cls.__defaults__._updated_dicts:
 			cls.__defaults__.update(cls.__this_defaults__)
+		
 	@staticmethod
 	def _static__repr__(self):
 		non_default_values = {}

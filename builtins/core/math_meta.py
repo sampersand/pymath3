@@ -2,6 +2,7 @@ from pymath3.utils import DefaultMeta
 from . import logger
 
 class _gen_slots_class():
+	__slots__ = ('_slots', )
 	def __init__(self, bases):
 		self._slots = self._get_slots_from_bases(bases)
 
@@ -29,7 +30,7 @@ class _gen_slots_class():
 		return frozenset(ret)
 
 class MathMeta(DefaultMeta):
-
+	__slots__ = ()
 	@classmethod
 	def __prepare__(metacls, name, bases, **kwargs):
 		ret = super().__prepare__(name, bases, **kwargs)

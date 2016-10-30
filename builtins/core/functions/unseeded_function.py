@@ -1,32 +1,38 @@
 from typing import Callable, Union, Dict, AnyStr
 
-from . import MathObj, NamedObj, DefaultMeta
+from . import MathObj, NamedObj
 from .seeded_function import SeededFunction
+
 BASE_FUNC_TYPE = Callable[[MathObj, type(...)], MathObj]
-
-class UnseededFunction(NamedObj, metaclass=DefaultMeta):
-
-	DEFAULT_SEEDED_TYPE = SeededFunction
-	DEFAULT_FUNC_ARGLEN = None
-	DEFAULT_BASE_FUNC = None
-	DEFAULT_FUNC_ARGS = None
-	DEFAULT_FUNC_BODY = None
-	DEFAULT_FUNC_STRS = (DEFAULT_FUNC_ARGS, DEFAULT_FUNC_BODY)
+class UnseededFunction(NamedObj):
+	__this_defaults__ = {
+		'seeded_type' : SeededFunction,
+		'func_arglen' : None,
+		'base_func' : None,
+		'func_args' : None,
+		'func_body' : None,
+	}
+	__this_defaults__['func_strs'] = (__this_defaults__['func_args'], __this_defaults__['func_body'])
+	__update_defaults__(__this_defaults__, __defaults__) # just to be explicit
+	print(__defaults__, __defaults__.func_arglen)
 
 	def __init__(self,
-			base_func: Union[BASE_FUNC_TYPE, 'type(print(defaults)))', 'type(defaults.base_func)'] = None,
-			func_strs: Union[Dict[AnyStr, AnyStr], 'defaults.func_strs'] = None,
-			arglen: Union[int, 'defaults,func_strs']  = None,
+			base_func: Union[BASE_FUNC_TYPE, __defaults__.base_func] = None,
+			func_strs: Union[Dict[AnyStr, AnyStr], __defaults__.func_strs] = None,
+			arglen: Union[int, __defaults__.func_arglen] = None,
 			**kwargs):
-		self.set_values(base_func = base_func, func_strs = func_strs, arglen = arglen)
 		super().__init__(**kwargs)
+		self.base_func = base_func
+		self.func_strs = func_strs
+		self.arglen = arglen
 
 	def __call__(self, *args):
-		return self.SEEDED_TYPE(unseeded_base = self, base_args = args)
+		return self.__defaults__.seeded_type(unseeded_base = self, base_args = args)
 
 	base_func = property(doc = "The function this UnseededFunction is built around.")
+
 	@base_func.getter
-	def base_func(self) -> Union[BASE_FUNC_TYPE, defaults.BASE_FUNC]:
+	def base_func(self) -> Union[BASE_FUNC_TYPE, __defaults__.base_func]:
 		return self._base_func
 
 	@base_func.setter

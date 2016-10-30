@@ -1,3 +1,5 @@
+from inspect import stack
+
 def from_stack(varname, stack_level):
 	frame_info = stack()[stack_level]
 	f_locals = frame_info.frame.f_locals
