@@ -82,9 +82,10 @@ class DefaultMeta(type):
 
 	Note: This also works with annotations!
 	'''
-	
+	# __definition_order__ = 1 
 	@classmethod
 	def __prepare__(metacls, name, bases, **kwargs):
+
 		ret = super().__prepare__(metacls, name, bases, **kwargs)
 
 		__defaults__ = _DefaultDict()

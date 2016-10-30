@@ -1,0 +1,19 @@
+def foo(*, d): #doesn't accept positional args, requires d.
+	...
+
+a = 5
+b = 9
+f'the answer is {a + b}'  --> 'the answer is 14' #woah
+
+raise CustomError("Failed to call D") from e
+
+
+__definition_order__
+__init_subclass__
+
+@contextmanager
+contextlib.redirect_stdout
+functools.lru_cache
+functools.partialmethod
+inspect.getattr_static
+__wrapped__
