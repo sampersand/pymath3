@@ -1,3 +1,4 @@
+
 def foo(*, d): #doesn't accept positional args, requires d.
 	...
 

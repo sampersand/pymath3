@@ -1,5 +1,3 @@
-from typing import Union, Any
-
 from . import logger
 from .valued_obj import ValuedObj
 from .user_obj import UserObj
@@ -20,8 +18,8 @@ class Constant(ValuedObj):
 	__slots__ = __gen_slots__()
 
 	def __init__(self,
-				value: __defaults__.allowed_types = __defaults__.value,
-				**kwargs: Union[Any, Any]) -> None:
+				value = __defaults__.value,
+				**kwargs) -> None:
 		''' Instantiates self.
 
 		If value is not of __defaults__.allowed_types, a warning will be logged.

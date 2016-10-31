@@ -1,120 +1,83 @@
 from . import logger, from_stack
-
-class _DefaultDict(dict):
-	__slots__ = ('_updated_dicts', '_parent', '_name')
-
-	def __init__(self):
-		super().__init__()
-		self._updated_dicts = []
-
-	def __set_name__(self, parent, name):
+from collections import OrderedDict
+class _WrappedObject():
+	def __init__(self, parent):
 		self._parent = parent
-		self._name = name
-		return self
+	def __getattribute__(self, attr):
+		parent = super().__getattribute__('_parent')
+		return super(type(parent), parent).__getattribute__(attr)
 
-	def __getitem__(self, item, stack_level = None):
-		if item not in self:
-			logger.debug("Item '{}' not in type {}, looking for it in __this_defaults__!".format(
-				item, type(self).__qualname__))
-			self.update(from_stack('__this_defaults__', stack_level or -2))
-		return super().__getitem__(item)
+class _AttrDict(dict):
+	def __init__(self, *args, **kwargs):
+		super().__init__(*args, **kwargs)
 
+	@property
+	def __self__(self):
+		return _WrappedObject(self)
 
-	def update(self, other):
-		if not isinstance(other, dict):
-			raise TypeError('Cannot update type {} with a non-dict type'.format(type(self)))
-		if other in self._updated_dicts:
-			logger.debug("Attempted to update {}'s __defaults__ with the dictionary '{}' more than once.".format(
-				self._parent, other))
-	
-		self._updated_dicts.append(other)
-		ret = super().update(other)
+	@staticmethod
+	def __set_name__(caller, name):
+		pass
 
-	def __getattr__(self, attr):
-		return self[attr]
+	def __getattribute__(self, attr):
+		if attr in self:
+			assert attr != '__self__'
+			return self[attr]
+		return super().__getattribute__(attr)
 
-
-def __update_defaults__(this_defaults, defaults = None, stack_level = -1):
-	if defaults is None:
-		defaults = from_stack('__defaults__', stack_level)
-
-	defaults.update(this_defaults)
-
+class _PreparedDict(OrderedDict):
+	@staticmethod
+	def process_new_defaults(new):
+		return new
+	def __setitem__(self, name, value):
+		if name == '__defaults__' and '__defaults__' in self:
+			if __debug__ and not isinstance(value, dict):
+				logger.warning("Recieved non-dict type for __defaults__: {}".format(type(value)))
+			self['__defaults__'].__self__.update(self.process_new_defaults(value))
+		else:
+			super().__setitem__(name, value)
 
 class DefaultMeta(type):
-	''' A Meta-class that standardizes default values
+	_defaults_dict = _AttrDict
+	_prepared_dict = _PreparedDict
 
-	To define defaults, a class should define '__this_defaults__' in it's body somewhere; to access
-	said defaults, '__defaults__' can be used.
-	
-	An example is a helpful way to illustrate:
+	__meta_defaults__ = _AttrDict()
 
-		class Foo(metaclass=DefaultMeta):
-			__this_defaults__ = {'spam': 'eggs', 'ham': True}
-			def __init__(self, spam = __defaults__.spam, ham = __defaults__.ham):
-				...
-
-	By default, '__defaults__' is an empty dict. If the parent classes have the '__defaults__'
-	attribute defined, all such '__defaults__'s are combined together
-
-	Children will also take on all the defaults of their parents.
-
-		class Bar(Foo):
-			# __defaults__ is implicitly created from parent classes' __default___'s.
-			# in this case, __defaults__ == {'spam': 'eggs', 'ham': True}
-			__this_defaults__ = {'toast': 'jam'}
-			def __init__(self, spam = __defaults__.spam, toast = __defaults__.toast):
-				...
-
-	The mere declaration of '__this_defaults__' does not ensure that it is added to '__defaults__',
-	however there are a few ways to ensure it does.
-		1. Explitictly, via the '__update_defaults__' method.
-	
-			class Car(metaclass=DefaultMeta)
-				__this_defaults__ = {'colour': 'red'}
-				__update_defaults__(__this_defaults__)
-		
-		2. Implicitly by either getting an attribute or an item from __defaults__ that isn't defined
-			Note: This will cause '__this_defaults__' to be imported regardless of whether or not
-				  the item in question exists in '__this_defaults__' or '__defaults__'.
-
-		3. At the end of the class creation, if '__defaults__' isn't used.
-
-	Note: This also works with annotations!
-	'''
-	# __definition_order__ = 1 
 	@classmethod
-	def __prepare__(metacls, name, bases, **kwargs):
+	def _get_defaults(metacls, bases):
+		defaults = metacls._defaults_dict()
 
-		ret = super().__prepare__(metacls, name, bases, **kwargs)
-
-		__defaults__ = _DefaultDict()
+		assert isinstance(bases, tuple)
+		assert isinstance(metacls, type)
+		assert isinstance(defaults, dict)
 
 		for base in bases:
 			if hasattr(base, '__defaults__'):
-				__defaults__.update(base.__defaults__)
+				if __debug__ and not isinstance(base.__defaults__, dict):
+					logger.warning("Class {}'s __defaults__ (type: {}) is not an instance of dict".format(
+						base.__qualname__, type(base.__defaults__).__qualname__))
+				assert isinstance(base.__defaults__, dict)
+				defaults.update(base.__defaults__)
+		return defaults
 
-		ret['__defaults__'] = __defaults__
-		ret['__update_defaults__'] = __update_defaults__
-		return ret
-	def __new__(cls, name, bases, attrs, **kwargs):
-		# print(cls, name, bases, attrs, kwargs)
-		# quit(attrs)
-		ret = super().__new__(cls, name, bases, attrs, **kwargs)
-	def __init__(cls, name, bases, attrs, **kwargs):
-		type.__init__(cls, name, bases, attrs, **kwargs)
-		if '__repr__' not in attrs:
-			cls.__repr__ = DefaultMeta._static__repr__
+	@classmethod
+	def __prepare__(metacls, name, bases, **kwargs):
+		super_prepare = super().__prepare__(metacls, name, bases, **kwargs)
+		prepared = metacls._prepared_dict(super_prepare)
 
-		assert hasattr(cls, '__defaults__') # Should have been made in __prepare__
+		assert isinstance(prepared, dict)
+		assert '__defaults__' not in prepared # this will be generated
 
-		if hasattr(cls, '__this_defaults__') and cls.__this_defaults__ not in cls.__defaults__._updated_dicts:
-			cls.__defaults__.update(cls.__this_defaults__)
-		
-	@staticmethod
-	def _static__repr__(self):
+		prepared['__defaults__'] = metacls._get_defaults(bases)
+		prepared['__meta_defaults__'] = metacls.__meta_defaults__
+		return prepared
+
+
+class NestedDefaultMeta(DefaultMeta):
+	def _default_repr__(self):
 		non_default_values = {}
-		for name, default_value in self.__defaults__.items():
+		assert '__init__' in dir(self)
+		for name, default_value in self.__defaults__.__init__.items():
 			assert hasattr(self, name)
 			self_value = getattr(self, name)
 			if self_value is not default_value:
@@ -123,6 +86,53 @@ class DefaultMeta(type):
 			', '.join('{}={!r}'.format(name, value) for name, value in non_default_values.items()))
 
 
+	class _NestedPreparedDict(_PreparedDict):
+		@classmethod
+		def flatten(cls, e):
+			return e if not isinstance(e, dict) else _AttrDict({k : cls.flatten(v) for k, v in e.items()})
+		# @staticmethod
+		@classmethod
+		def process_new_defaults(cls, new):
+			return cls.flatten(new)
+
+
+	_prepared_dict = _NestedPreparedDict
+
+	__meta_defaults__ = _AttrDict({
+		'__repr__' : _default_repr__,
+	})
+
+class foo(metaclass=NestedDefaultMeta):
+	__defaults__ = {
+		'__init__': {
+			'a': 1,
+			'b': 2
+			},
+		'__call__': {
+			'arg1': 3
+		},
+		'__str__': {
+		'a': 1
+		}
+	}
+	def __init__(self, a = __defaults__.__init__.a):
+		self.a = a
+	# __defaults__ = {'a': 9}
+class bar(foo):
+	def __init__(self, a = __defaults__.a, b = __defaults__.b):
+		super().__init__()
+		self.b = b
+	__repr__ = __meta_defaults__['__repr__']
+b = bar()
+print(b.__defaults__)
+print(repr(b))
 
 
 
+
+
+
+
+
+
+quit()
