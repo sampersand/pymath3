@@ -1,5 +1,5 @@
-from . import logger, from_stack, convert, auto
-from collections import OrderedDict
+from . import logger, from_stack, convert as formal_convert, auto
+from collections import OrderedDict, Iterable
 
 
 class _WrappedObject():
@@ -10,7 +10,7 @@ class _WrappedObject():
 		parent = super().__getattribute__('_parent')
 		return super(type(parent), parent).__getattribute__(attr)
 
-class _AttrDict(dict):
+class _DefaultDict(dict):
 	def __init__(self, *args, **kwargs):
 		super().__init__(*args, **kwargs)
 
@@ -29,29 +29,36 @@ class _AttrDict(dict):
 		return super().__getattribute__(attr)
 
 class _PreparedDict(OrderedDict):
+	REQUIRED_ATTRS_FOR_NEW_DEFAULTS = ('__iter__', '__getitem__', '__setitem__')
+	@classmethod
+	def verify_default_attrs(cls, inp):
+		for req_attr in cls.REQUIRED_ATTRS_FOR_NEW_DEFAULTS:
+			if not hasattr(inp, req_attr):
+				raise AttributeError("'{}' cannot be __defaults__; missing attr '{}'".format(
+					type(inp).__qualname__, req_attr))
+
 	@staticmethod
 	def process_new_defaults(new):
 		return new
-	def __setitem__(self, name, value):
-		if name == '__defaults__' and '__defaults__' in self:
-			if __debug__ and not isinstance(value, dict):
-				logger.warning("Recieved non-dict type for __defaults__: {}".format(type(value)))
-			self['__defaults__'].__self__.update(self.process_new_defaults(value))
-		else:
-			super().__setitem__(name, value)
 
-def _convert(func = None, *, defaults = None):
-	if defaults is None:
-		defaults = from_stack('__defaults__', 2)
-	if func is None:
-		assert defaults is not None
-		return lambda func: _convert(func = func, defaults = defaults)
-	return convert(defaults)(func)
+	def __setitem__(self, name, value):
+		if name == '__defaults__':
+			if '__defaults__' in self:
+				if not isinstance(value, dict):
+					logger.warning("Recieved non-dict type for __defaults__: {}".format(type(value)))
+				processed_defaults = self.process_new_defaults(value)
+				self.verify_default_attrs(processed_defaults)
+				self['__defaults__'].__self__.update(processed_defaults)
+				return
+			else:
+				self.verify_default_attrs(value)
+		super().__setitem__(name, value)
+
 class DefaultMeta(type):
-	_defaults_dict = _AttrDict
+	_defaults_dict = _DefaultDict
 	_prepared_dict = _PreparedDict
 
-	__meta_defaults__ = _AttrDict({})
+	__meta_defaults__ = _DefaultDict({})
 
 	@classmethod
 	def _get_defaults(metacls, bases):
@@ -93,12 +100,6 @@ class NestedDefaultMeta(DefaultMeta):
 			else:
 				converter = self.__meta_defaults__['__converter__']
 
-
-		# if converter is None:
-		# 	if '__repr__' in self.__defaults__ and '__converter__' in self.__defaults__.__repr__:
-		# 		converter = self.__defaults__.__repr__.__converter__
-		# 	else:
-		# 		converter = lambda name: name
 		assert callable(converter)
 
 		non_default_values = {}
@@ -118,16 +119,23 @@ class NestedDefaultMeta(DefaultMeta):
 		return '{}({})'.format(type(self).__qualname__,
 			', '.join('{}={!r}'.format(attr_name, value) for attr_name, value in non_default_values.items()))
 
+	def convert(func = None, *, defaults = None):
+		if defaults is None:
+			defaults = from_stack('__defaults__', 2)
+		if func is None:
+			assert defaults is not None
+			return lambda func: formal_convert(defaults = defaults, func = func)
+		return convert(func = func, defaults = defaults)
 
 	class _NestedPreparedDict(_PreparedDict):
 		@classmethod
 		def flatten(cls, e):
-			return e if not isinstance(e, dict) else _AttrDict({k : cls.flatten(v) for k, v in e.items()})
+			return e if not isinstance(e, dict) else _DefaultDict({k : cls.flatten(v) for k, v in e.items()})
 		# @staticmethod
 		@classmethod
 		def process_new_defaults(cls, new):
 			return cls.flatten(new)
-	class _NestedAttrDict(_AttrDict):
+	class _NestedAttrDict(_DefaultDict):
 		def update(self, values):
 			for key, value in values.items():
 				if key in self and hasattr(self[key], 'update'):
@@ -137,61 +145,14 @@ class NestedDefaultMeta(DefaultMeta):
 	_defaults_dict = _NestedAttrDict
 	_prepared_dict = _NestedPreparedDict
 
-	__meta_defaults__ = _AttrDict({
+	__meta_defaults__ = _DefaultDict({
 		'__repr__' : _default_repr__,
 		'auto': auto,
-		'convert': _convert,
+		'convert': convert,
 		'__converter__': lambda attrname: attrname
 	})
 	__meta_defaults__.update(DefaultMeta.__meta_defaults__)
 
 
+__all__ = ('DefaultMeta', 'NestedDefaultMeta')
 
-
-
-
-class foo(metaclass=NestedDefaultMeta):
-	__defaults__ = {
-		'__init__': {
-			'a': 3
-		},
-		# '__converter__': lambda x: '_' + x
-	}
-	convert = __meta_defaults__.convert
-	auto = __meta_defaults__.auto
-
-	@convert()
-	def __init__(self, a = auto):
-		self.a = a
-	__repr__ = __meta_defaults__.__repr__
-
-class bar(foo):
-	__defaults__ = {
-		'__init__': {
-			'b': 9,
-			# 'q': 3,
-			},
-		'__call__': {
-			'arg1': 3
-		},
-	}
-	convert = __meta_defaults__.convert
-	auto = __meta_defaults__.auto
-
-
-
-	@convert()
-	def __init__(self, a = auto, b = auto, c = auto):
-		super().__init__(a)
-		self.b = b
-
-b = bar()
-print(b.a)
-print(repr(b))
-
-
-
-
-
-
-quit()

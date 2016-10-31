@@ -5,9 +5,8 @@ class AutoType():
 	__slots__ = ()
 	def __new__(cls):
 		if cls.instance is not None:
-			if __debug__:
-				logger.warning('Attempted to re-instantiate {}, using current instance instead!'.
-					format(type(cls).__qualname__))
+			logger.debug('Attempted to re-instantiate {}, using current instance instead!'.
+				format(type(cls).__qualname__))
 			return cls.instance
 		return super().__new__(cls)
 	def __init__(self):
@@ -30,9 +29,8 @@ def _update_positional(func, defaults):
 	assert hasattr(func, '__defaults__'), 'Functions should have __defaults__...'
 	assert isinstance(defaults, dict), 'Passed defaults need to be a dict'
 	if not func.__defaults__:
-		if __debug__:
-			assert hasattr(func, '__name__')
-			logger.debug('Function {} has an empty/None __defaults__'.format(func.__name__))
+		assert hasattr(func, '__name__')
+		logger.debug('Function {} has an empty/None __defaults__'.format(func.__name__))
 		return
 
 	s = signature(func)
@@ -47,9 +45,8 @@ def _update_positional(func, defaults):
 		assert empty is params[arg_name].empty
 
 		if arg_default is empty:
-			if __debug__:
-				assert hasattr(func, '__name__')
-				logger.debug('arg_name {}.{} is empty'.format(func.__name__, arg_name))
+			assert hasattr(func, '__name__')
+			logger.debug('arg_name {}.{} is empty'.format(func.__name__, arg_name))
 			continue
 
 		if arg_default is auto:
@@ -65,9 +62,8 @@ def _update_keywords(func, defaults):
 	assert hasattr(func, '__kwdefaults__'), 'Functions should have __kwdefaults__...'
 	assert isinstance(defaults, dict), 'Passed defaults need to be a dict'
 	if not func.__kwdefaults__:
-		if __debug__:
-			assert hasattr(func, '__name__')
-			logger.debug('Function {} has an empty/None __kwdefaults__'.format(func.__name__))
+		assert hasattr(func, '__name__')
+		logger.debug('Function {} has an empty/None __kwdefaults__'.format(func.__name__))
 		return
 	assert isinstance(func.__kwdefaults__, dict) # python sets this by default...
 	for kw_name, val in func.__kwdefaults__.items():
@@ -76,47 +72,40 @@ def _update_keywords(func, defaults):
 				raise KeyError("Keyword '{}' not in defaults!".format(kw_name))
 			func.__kwdefaults__[kw_name] = defaults[kw_name]
 
-def _default_retriever(func, defaults):
-	assert isfunction(func), 'Need a function to find the defaults for'
-	assert isinstance(defaults, dict), 'Passed defaults need to be a dict'
+# def _default_retriever(func, defaults):
+# 	assert isfunction(func), 'Need a function to find the defaults for'
+# 	assert isinstance(defaults, dict), 'Passed defaults need to be a dict'
 
-	if not hasattr(func, '__name__'):
-		raise AttributeError('Cannot extract __name__ from func!')
+# 	if not hasattr(func, '__name__'):
+# 		raise AttributeError('Cannot extract __name__ from func!')
 
-	assert hasattr(func, '__name__')
-	return defaults[func.__name__]
+# 	assert hasattr(func, '__name__')
+# 	return defaults[func.__name__]
 
-def convert(__defaults__, *, _retriever = _default_retriever):
+def convert(defaults, func):
+	""" Replace all 'autos' of a function with their corresponding values in defaults.
+	"""
 
-	if __debug__ and _retriever is not _default_retriever:
-		logger.debug('Recieved non-default _retriever: {}'.format(_retriever))
-	if not callable(_retriever):
-		logger.warning('Passed _retriever is not callable')
-	if not isinstance(__defaults__, dict):
-		logger.warning('Passed __defaults__ is non-dict type {}'.format(type(__defaults__)))
+	if not isinstance(defaults, dict):
+		logger.warning('Recieved non-dict for defaults: {}'.format(type(defaults)))
+	if not isfunction(func):
+		logger.warning("Attempting to convert non-function type {}".format(type(func)))
+	
+	assert isfunction(func), type(func)
+	assert isinstance(defaults, dict)
 
-	assert callable(_retriever), _retriever
-	assert hasattr(__defaults__, '__getitem__')
-
-	def capture(func, func_defaults = None):
-		if __debug__ and func_defaults is not None:
-			logger.debug('Recieved non-default func_defaults: {}'.format(func_defaults))
-		if not isfunction(func):
-			logger.warning("Attempting to convert non-function type {}".format(type(func)))
-		assert isfunction(func), type(func)
+	if defaults is None:
+		defaults = _retriever(func, __defaults__)
 
 
-		if func_defaults is None:
-			func_defaults = _retriever(func, __defaults__)
+	if not isinstance(defaults, dict):
+		logger.warning('Computed defaults is non-dict type {}'.formaT(type(defaults)))
+	assert hasattr(defaults, '__getitem__')
 
+	_update_positional(func, defaults)
+	_update_keywords(func, defaults)
 
-		if not isinstance(func_defaults, dict):
-			logger.warning('Computed func_defaults is non-dict type {}'.formaT(type(func_defaults)))
-		assert hasattr(func_defaults, '__getitem__')
+	return func
+__all__ = 'convert', 'auto'
 
-		_update_positional(func, func_defaults)
-		_update_keywords(func, func_defaults)
-
-		return func
-	return capture
 
