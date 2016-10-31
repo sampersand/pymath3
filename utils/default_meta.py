@@ -27,6 +27,8 @@ class _DefaultDict(dict):
 			assert attr != '__self__'
 			return self[attr]
 		return super().__getattribute__(attr)
+	def __hash__(self):
+		return 1
 
 class _PreparedDict(OrderedDict):
 	REQUIRED_ATTRS_FOR_NEW_DEFAULTS = ('__iter__', '__getitem__', '__setitem__')
@@ -42,18 +44,26 @@ class _PreparedDict(OrderedDict):
 		return new
 
 	def __setitem__(self, name, value):
+		assert isinstance(name, str)
 		if name == '__defaults__':
-			if '__defaults__' in self:
-				if not isinstance(value, dict):
-					logger.warning("Recieved non-dict type for __defaults__: {}".format(type(value)))
-				processed_defaults = self.process_new_defaults(value)
-				self.verify_default_attrs(processed_defaults)
-				self['__defaults__'].__self__.update(processed_defaults)
-				return
-			else:
-				self.verify_default_attrs(value)
+			self.verify_default_attrs(value)
+
+		if name == '__class_defaults__' and '__defaults__' in self:
+			if not isinstance(value, dict):
+				logger.warning("Recieved non-dict type for __defaults__: {}".format(type(value)))
+			processed_defaults = self.process_new_defaults(value)
+			self.verify_default_attrs(processed_defaults)
+			self['__defaults__'].__self__.update(processed_defaults)
+			return
 		super().__setitem__(name, value)
 
+	def __delitem__(self, value):
+		assert isinstance(value, str)
+		if value == '__defaults__':
+			logger.error('NameError: Cannot delete __defaults__ attribute; this is being surpressed!')
+			raise NameError('Cannot delete __defaults__ attribute')
+		else:
+			super().__delitem__(value)
 class DefaultMeta(type):
 	_defaults_dict = _DefaultDict
 	_prepared_dict = _PreparedDict
@@ -88,7 +98,6 @@ class DefaultMeta(type):
 		prepared['__defaults__'] = metacls._get_defaults(bases)
 		prepared['__meta_defaults__'] = metacls.__meta_defaults__
 		return prepared
-
 
 class NestedDefaultMeta(DefaultMeta):
 	def _default_repr__(self, converter = None):
@@ -155,4 +164,9 @@ class NestedDefaultMeta(DefaultMeta):
 
 
 __all__ = ('DefaultMeta', 'NestedDefaultMeta')
+
+
+
+
+
 
