@@ -9,7 +9,6 @@ class _WrappedObject():
 	def __getattribute__(self, attr):
 		parent = super().__getattribute__('_parent')
 		return super(type(parent), parent).__getattribute__(attr)
-
 class _DefaultDict(dict):
 	def __init__(self, *args, **kwargs):
 		super().__init__(*args, **kwargs)
@@ -22,22 +21,30 @@ class _DefaultDict(dict):
 	def __set_name__(caller, name):
 		pass
 
+	def __contains__(self, attr):
+		return super().__contains__(attr)
+
 	def __getattribute__(self, attr):
 		if attr in self:
 			assert attr != '__self__'
 			return self[attr]
 		return super().__getattribute__(attr)
-	def __hash__(self):
-		return 1
 
+	def update(self, d):
+		_PreparedDict.verify_default_dict_attrs(d)
+		for name in d:
+			if name in dict(self):
+				logger.info('{} (prev={}) is being overriden with {}'.format(name, d[name], self[name]))
+		super().update(d)
 class _PreparedDict(OrderedDict):
 	REQUIRED_ATTRS_FOR_NEW_DEFAULTS = ('__iter__', '__getitem__', '__setitem__')
-	@classmethod
-	def verify_default_attrs(cls, inp):
-		for req_attr in cls.REQUIRED_ATTRS_FOR_NEW_DEFAULTS:
+
+	@staticmethod
+	def verify_default_dict_attrs(inp):
+		for req_attr in _PreparedDict.REQUIRED_ATTRS_FOR_NEW_DEFAULTS:
 			if not hasattr(inp, req_attr):
-				raise AttributeError("'{}' cannot be __defaults__; missing attr '{}'".format(
-					type(inp).__qualname__, req_attr))
+				raise TypeError("Missing attribute '{}' in '{}'".format(req_attr, type(inp).__qualname__))
+		return True
 
 	@staticmethod
 	def process_new_defaults(new):
@@ -46,15 +53,12 @@ class _PreparedDict(OrderedDict):
 	def __setitem__(self, name, value):
 		assert isinstance(name, str)
 		if name == '__defaults__':
-			self.verify_default_attrs(value)
+			self.verify_default_dict_attrs(value)
 
 		if name == '__class_defaults__' and '__defaults__' in self:
 			if not isinstance(value, dict):
-				logger.warning("Recieved non-dict type for __defaults__: {}".format(type(value)))
-			processed_defaults = self.process_new_defaults(value)
-			self.verify_default_attrs(processed_defaults)
-			self['__defaults__'].__self__.update(processed_defaults)
-			return
+				logger.info("Recieved non-dict type for __defaults__: {}".format(type(value)))
+			self['__defaults__'].__self__.update(self.process_new_defaults(value))
 		super().__setitem__(name, value)
 
 	def __delitem__(self, value):
@@ -84,7 +88,7 @@ class DefaultMeta(type):
 					logger.warning("Class {}'s __defaults__ (type: {}) is not an instance of dict".format(
 						base.__qualname__, type(base.__defaults__).__qualname__))
 				assert isinstance(base.__defaults__, dict)
-				defaults.update(base.__defaults__)
+				defaults.__self__.update(base.__defaults__)
 		return defaults
 
 	@classmethod
