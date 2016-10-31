@@ -1,5 +1,7 @@
-from . import logger, from_stack
+from . import logger, from_stack, convert, auto
 from collections import OrderedDict
+
+
 class _WrappedObject():
 	def __init__(self, parent):
 		self._parent = parent
@@ -37,11 +39,18 @@ class _PreparedDict(OrderedDict):
 		else:
 			super().__setitem__(name, value)
 
+def _convert(func = None, *, defaults = None):
+	if defaults is None:
+		defaults = from_stack('__defaults__', 2)
+	if func is None:
+		assert defaults is not None
+		return lambda func: _convert(func = func, defaults = defaults)
+	return convert(defaults)(func)
 class DefaultMeta(type):
 	_defaults_dict = _AttrDict
 	_prepared_dict = _PreparedDict
 
-	__meta_defaults__ = _AttrDict()
+	__meta_defaults__ = _AttrDict({})
 
 	@classmethod
 	def _get_defaults(metacls, bases):
@@ -74,16 +83,30 @@ class DefaultMeta(type):
 
 
 class NestedDefaultMeta(DefaultMeta):
-	def _default_repr__(self):
+	def _default_repr__(self, converter = None):
+		if converter is None:
+			if '__repr__' in self.__defaults__ and '__converter__' in self.__defaults__.__repr__:
+				converter = self.__defaults__.__repr__.__converter__
+			else:
+				converter = lambda name: name
+		assert callable(converter)
+
 		non_default_values = {}
-		assert '__init__' in dir(self)
-		for name, default_value in self.__defaults__.__init__.items():
-			assert hasattr(self, name)
-			self_value = getattr(self, name)
+		if '__init__' not in self.__defaults__:
+			raise AttributeError('No __init__ in self - cannot construct a default repr!')
+
+		assert '__init__' in self.__defaults__
+
+		for attr_name, default_value in self.__defaults__.__init__.items():
+			attr_name = converter(attr_name)
+			if not hasattr(self, attr_name):
+				raise AttributeError("Class {} defines {} in __init__ default, but doesn't have the attribute".format(type(self).__qualname__, attr_name))
+			assert hasattr(self, attr_name)
+			self_value = getattr(self, attr_name)
 			if self_value is not default_value:
-				non_default_values[name] = self_value
+				non_default_values[attr_name] = self_value
 		return '{}({})'.format(type(self).__qualname__,
-			', '.join('{}={!r}'.format(name, value) for name, value in non_default_values.items()))
+			', '.join('{}={!r}'.format(attr_name, value) for attr_name, value in non_default_values.items()))
 
 
 	class _NestedPreparedDict(_PreparedDict):
@@ -94,41 +117,58 @@ class NestedDefaultMeta(DefaultMeta):
 		@classmethod
 		def process_new_defaults(cls, new):
 			return cls.flatten(new)
-
-
+	class _NestedAttrDict(_AttrDict):
+		def update(self, values):
+			for key, value in values.items():
+				if key in self and hasattr(self[key], 'update'):
+					self[key].update(value)
+				else:
+					self[key] = value
+	_defaults_dict = _NestedAttrDict
 	_prepared_dict = _NestedPreparedDict
 
 	__meta_defaults__ = _AttrDict({
 		'__repr__' : _default_repr__,
+		'auto': auto,
+		'convert': _convert,
 	})
+	__meta_defaults__.update(DefaultMeta.__meta_defaults__)
 
 class foo(metaclass=NestedDefaultMeta):
 	__defaults__ = {
 		'__init__': {
-			'a': 1,
-			'b': 2
+			'a': 3
+		}
+	}
+	convert = __meta_defaults__.convert
+	auto = __meta_defaults__.auto
+
+	@convert()
+	def __init__(self, a = auto):
+		self.a = a
+	__repr__ = __meta_defaults__.__repr__
+class bar(foo):
+	__defaults__ = {
+		'__init__': {
+			'b': 9,
 			},
 		'__call__': {
 			'arg1': 3
 		},
-		'__str__': {
-		'a': 1
-		}
 	}
-	def __init__(self, a = __defaults__.__init__.a):
-		self.a = a
-	# __defaults__ = {'a': 9}
-class bar(foo):
-	def __init__(self, a = __defaults__.a, b = __defaults__.b):
-		super().__init__()
+	convert = __meta_defaults__.convert
+	auto = __meta_defaults__.auto
+
+
+
+	@convert()
+	def __init__(self, a = auto, b = auto):
+		super().__init__(a)
 		self.b = b
-	__repr__ = __meta_defaults__['__repr__']
+
 b = bar()
-print(b.__defaults__)
+print(b.a)
 print(repr(b))
-
-
-
 
 
 
