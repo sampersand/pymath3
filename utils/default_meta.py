@@ -1,17 +1,24 @@
-from . import logger, from_stack, convert as formal_convert, auto
+from . import logger, from_stack, convert as formal_convert, auto, immutable
 from collections import OrderedDict, Iterable
 
 
 class _WrappedObject():
-	def __init__(self, parent):
-		# assert isinstance(parent, __default__)
-		self._parent = parent
+	def __init__(self, parent, *args, **kwargs):
+		super().__init__(*args, **kwargs)
+		super().__setattr__('_parent', parent)
+	@property
+	def locked(self):
+		return hasattr(self, '_parent')
 	def __getattribute__(self, attr):
 		parent = super().__getattribute__('_parent')
+		if attr == '_parent':
+			return parent
 		return super(type(parent), parent).__getattribute__(attr)
-class _DefaultDict(dict):
-	def __init__(self, *args, **kwargs):
-		super().__init__(*args, **kwargs)
+
+class _DefaultDict(immutable, dict, lock=False):
+	# def __init__(self, inp_dict = None, *args, **kwargs):
+	# 	super().__init__(inp_dict, *args, **kwargs)
+	# 	dict.__init__(self, inp_dict)
 
 	@property
 	def __self__(self):
@@ -29,8 +36,9 @@ class _DefaultDict(dict):
 			assert attr != '__self__'
 			return self[attr]
 		return super().__getattribute__(attr)
-
+	
 	def update(self, d):
+		self.assert_unlocked()
 		_PreparedDict.verify_default_dict_attrs(d)
 		for name in d:
 			if name in dict(self):
@@ -38,7 +46,6 @@ class _DefaultDict(dict):
 		super().update(d)
 class _PreparedDict(OrderedDict):
 	REQUIRED_ATTRS_FOR_NEW_DEFAULTS = ('__iter__', '__getitem__', '__setitem__')
-
 	@staticmethod
 	def verify_default_dict_attrs(inp):
 		for req_attr in _PreparedDict.REQUIRED_ATTRS_FOR_NEW_DEFAULTS:
@@ -68,11 +75,12 @@ class _PreparedDict(OrderedDict):
 			raise NameError('Cannot delete __defaults__ attribute')
 		else:
 			super().__delitem__(value)
+
 class DefaultMeta(type):
 	_defaults_dict = _DefaultDict
 	_prepared_dict = _PreparedDict
 
-	__meta_defaults__ = _DefaultDict({})
+	__meta_defaults__ = _DefaultDict()
 
 	@classmethod
 	def _get_defaults(metacls, bases):
@@ -82,13 +90,14 @@ class DefaultMeta(type):
 		assert isinstance(metacls, type)
 		assert isinstance(defaults, dict)
 
-		for base in bases:
+		for base in reversed(bases): #reversed so the furthest away in the MRO is overriden
 			if hasattr(base, '__defaults__'):
 				if __debug__ and not isinstance(base.__defaults__, dict):
 					logger.warning("Class {}'s __defaults__ (type: {}) is not an instance of dict".format(
 						base.__qualname__, type(base.__defaults__).__qualname__))
 				assert isinstance(base.__defaults__, dict)
 				defaults.__self__.update(base.__defaults__)
+		assert not defaults.locked
 		return defaults
 
 	@classmethod
@@ -102,6 +111,16 @@ class DefaultMeta(type):
 		prepared['__defaults__'] = metacls._get_defaults(bases)
 		prepared['__meta_defaults__'] = metacls.__meta_defaults__
 		return prepared
+	def __init__(cls, name, bases, attrs, **kwargs):
+		super().__init__(name, bases, attrs, **kwargs)
+
+		assert not cls.__defaults__.locked
+		cls.__defaults__.acquire()
+		assert cls.__defaults__.locked
+	
+	def __setattr__(self, attr, value):
+		self.assert_unlocked()
+		super().__setattr__(attr, value)
 
 class NestedDefaultMeta(DefaultMeta):
 	def _default_repr__(self, converter = None):
