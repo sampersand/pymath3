@@ -25,3 +25,16 @@ class PropertyMeta(GenericMeta, ):
 
 		for c_name, c_values in controllers.items():
 			setattr(cls, c_name, property(**c_values))
+
+
+
+
+
+
+
+
+
+
+
+
+

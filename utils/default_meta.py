@@ -4,6 +4,7 @@ from collections import OrderedDict
 
 class _WrappedObject():
 	def __init__(self, parent):
+		# assert isinstance(parent, __default__)
 		self._parent = parent
 	def __getattribute__(self, attr):
 		parent = super().__getattribute__('_parent')
@@ -84,11 +85,20 @@ class DefaultMeta(type):
 
 class NestedDefaultMeta(DefaultMeta):
 	def _default_repr__(self, converter = None):
+		assert hasattr(self, '__defaults__')
+		assert hasattr(self, '__meta_defaults__')
 		if converter is None:
-			if '__repr__' in self.__defaults__ and '__converter__' in self.__defaults__.__repr__:
-				converter = self.__defaults__.__repr__.__converter__
+			if '__converter__' in self.__defaults__:
+				converter = self.__defaults__['__converter__']
 			else:
-				converter = lambda name: name
+				converter = self.__meta_defaults__['__converter__']
+
+
+		# if converter is None:
+		# 	if '__repr__' in self.__defaults__ and '__converter__' in self.__defaults__.__repr__:
+		# 		converter = self.__defaults__.__repr__.__converter__
+		# 	else:
+		# 		converter = lambda name: name
 		assert callable(converter)
 
 		non_default_values = {}
@@ -97,7 +107,7 @@ class NestedDefaultMeta(DefaultMeta):
 
 		assert '__init__' in self.__defaults__
 
-		for attr_name, default_value in self.__defaults__.__init__.items():
+		for attr_name, default_value in self.__defaults__['__init__'].items():
 			attr_name = converter(attr_name)
 			if not hasattr(self, attr_name):
 				raise AttributeError("Class {} defines {} in __init__ default, but doesn't have the attribute".format(type(self).__qualname__, attr_name))
@@ -131,14 +141,21 @@ class NestedDefaultMeta(DefaultMeta):
 		'__repr__' : _default_repr__,
 		'auto': auto,
 		'convert': _convert,
+		'__converter__': lambda attrname: attrname
 	})
 	__meta_defaults__.update(DefaultMeta.__meta_defaults__)
+
+
+
+
+
 
 class foo(metaclass=NestedDefaultMeta):
 	__defaults__ = {
 		'__init__': {
 			'a': 3
-		}
+		},
+		# '__converter__': lambda x: '_' + x
 	}
 	convert = __meta_defaults__.convert
 	auto = __meta_defaults__.auto
@@ -147,10 +164,12 @@ class foo(metaclass=NestedDefaultMeta):
 	def __init__(self, a = auto):
 		self.a = a
 	__repr__ = __meta_defaults__.__repr__
+
 class bar(foo):
 	__defaults__ = {
 		'__init__': {
 			'b': 9,
+			# 'q': 3,
 			},
 		'__call__': {
 			'arg1': 3
@@ -162,7 +181,7 @@ class bar(foo):
 
 
 	@convert()
-	def __init__(self, a = auto, b = auto):
+	def __init__(self, a = auto, b = auto, c = auto):
 		super().__init__(a)
 		self.b = b
 
