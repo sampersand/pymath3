@@ -40,14 +40,6 @@ class NamedObj(MathObj):
 	def name(self):
 		return self._name
 
-	@name.setter
-	def name(self, val):
-		self._name = val
-
-	@name.deleter
-	def name(self):
-		self._name = self._default_name
-
 	def hasname(self):
 		''' Return true if this this class has a name. '''
 		return self.name != self._default_name
