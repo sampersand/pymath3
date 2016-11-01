@@ -21,6 +21,4 @@ class MathObj():
 		super().__init__(*args, **kwargs)
 
 	def __repr__(self):
-		logger.info('math_obj.__repr__ is temporary')
-		return str(sorted(set(dir(self)) - set(dir(object()))))
-
+		return '{}()'.format(type(self).__qualname__)
