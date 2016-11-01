@@ -10,25 +10,6 @@ class Constant(ValuedObj):
 	'''
 
 	_default_value = 0
-	_allowed_types = (int, float, bool, complex, type(None))
-
-	def __init__(self, value = _default_value, **kwargs):
-		''' Instantiates self.
-
-		If value is not of __defaults__.allowed_types, a warning will be logged.
-
-		Arguments:
-			value    -- The value of this class. (defaults: Constant.DEFAULT_VALUE)
-			**kwargs -- Extra kwargs, will be ignored for this class.
-		Returns:
-			None
-		'''
-
-		if not isinstance(value, self._allowed_types):
-			logger.warning("Value is unknown type '{}'. Allowed types: {}".format(
-				type(value).__qualname__,
-				', '.join('%r' % x.__qualname__ for x in self._allowed_types)))
-		super().__init__(value = value, **kwargs)
 
 class UserConstant(UserObj, Constant):
 	''' The user class for Constant.

@@ -10,8 +10,11 @@ class ValuedObj(Operable):
 	
 	If attempting to directly instantiate a ValuedObj, a warning will be logged.
 	'''
+
 	_default_value = None
-	def __init__(self, value = _default_value, **kwargs):
+	_allowed_types = (int, float, bool, complex, type(None))
+
+	def __init__(self, *args, value = _default_value, **kwargs):
 		''' Initializes self with 'value'
 		
 		If attempting to directly instantiate a ValuedObj, a warning will be logged.
@@ -23,7 +26,8 @@ class ValuedObj(Operable):
 
 		if __debug__ and type(self) == ValuedObj:
 			logger.warning("Should not instantiate {} directly!".format(type(self).__qualname__))
-		super().__init__(**kwargs)
+
+		super().__init__(*args, **kwargs)
 		self.value = value
 
 
@@ -35,6 +39,10 @@ class ValuedObj(Operable):
 
 	@value.setter
 	def value(self, val):
+		if not isinstance(val, self._allowed_types):
+			logger.warning("Value is unknown type '{}'. Allowed types: {}".format(
+				type(val).__qualname__,
+				', '.join('%r' % x.__qualname__ for x in self._allowed_types)))
 		self._value = val
 
 	@value.deleter
