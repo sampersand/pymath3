@@ -10,7 +10,7 @@ class Constant(ValuedObj):
 	'''
 
 	_default_value = 0
-	_allowed_types = (int, float, bool, complex)
+	_allowed_types = (int, float, bool, complex, type(None))
 
 	def __init__(self, value = _default_value, **kwargs):
 		''' Instantiates self.
