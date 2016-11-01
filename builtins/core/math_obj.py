@@ -19,6 +19,7 @@ class MathObj():
 		if __debug__ and type(self) == MathObj:
 			logger.warning("Should not instantiate {} directly!".format(type(self).__qualname__))
 		super().__init__(*args, **kwargs)
+
 	def __repr__(self):
 		logger.info('math_obj.__repr__ is temporary')
 		return str(self.__dict__)

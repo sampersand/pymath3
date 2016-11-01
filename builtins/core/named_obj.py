@@ -1,6 +1,5 @@
 from . import logger
 from .math_obj import MathObj
-
 class NamedObj(MathObj):
 	''' Represents an object that can have a name.
 
@@ -12,7 +11,8 @@ class NamedObj(MathObj):
 	'''
 
 	_default_name = None
-	def __init__(self, name = _default_name, **kwargs):
+	_allowed_types = (str, bytes, type(None))
+	def __init__(self, *args, name = _default_name, **kwargs):
 		''' Initializes self with 'name'
 		
 		If attempting to directly instantiate a NamedObj, a warning will be logged.
@@ -25,7 +25,12 @@ class NamedObj(MathObj):
 		if __debug__ and type(self) == NamedObj:
 			logger.warning("Should not instantiate {} directly!".format(type(self).__qualname__))
 
-		super().__init__(**kwargs)
+		if not isinstance(name, self._allowed_types):
+			logger.warning("Name is unknown type '{}'. Allowed types: {}".format(
+				type(name).__qualname__,
+				', '.join('%r' % x.__qualname__ for x in self._allowed_types)))
+
+		super().__init__(*args, **kwargs)
 		self.name = name
 
 
@@ -61,10 +66,12 @@ class NamedObj(MathObj):
 
 		return super().__str__()
 
-	def __repr__(self):
-		''' Returns the string defined by gen_repr with the kwarg 'name'. '''
-		return self.gen_repr(name = (self.name, self._default_name))
-
-
-
 __all__ = ('NamedObj', )
+
+
+
+
+
+
+
+

@@ -25,8 +25,9 @@ class Constant(ValuedObj):
 		'''
 
 		if not isinstance(value, self._allowed_types):
-			logger.warning('Recieved an unknown type for value: {}. Allowed types: {}'.format(
-				type(value), self._allowed_types))
+			logger.warning("Value is unknown type '{}'. Allowed types: {}".format(
+				type(value).__qualname__,
+				', '.join('%r' % x.__qualname__ for x in self._allowed_types)))
 		super().__init__(value = value, **kwargs)
 
 class UserConstant(UserObj, Constant):
