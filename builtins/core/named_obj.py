@@ -31,7 +31,7 @@ class NamedObj(MathObj):
 				', '.join('%r' % x.__qualname__ for x in self._allowed_types)))
 
 		super().__init__(*args, **kwargs)
-		self.name = name
+		self._name = name #maybe make this _name?
 
 
 	name = property(doc = "The name of this class")
