@@ -11,8 +11,8 @@ class NamedObj(MathObj):
 	'''
 
 	_default_name = None
-	_allowed_types = (str, bytes, type(None))
-	def __init__(self, *args, name = _default_name, **kwargs):
+	_allowed_name_types = (str, bytes, type(None))
+	def __init__(self, *args, name = None, **kwargs):
 		''' Initializes self with 'name'
 		
 		If attempting to directly instantiate a NamedObj, a warning will be logged.
@@ -26,6 +26,8 @@ class NamedObj(MathObj):
 			logger.warning("Should not instantiate {} directly!".format(type(self).__qualname__))
 
 		super().__init__(*args, **kwargs)
+		if name is None:
+			name = self._default_name
 		self.name = name
 
 
@@ -39,10 +41,10 @@ class NamedObj(MathObj):
 	def name(self, newname):
 		if hasattr(self, '_name'):
 			logger.info('Overriding name {} with {}'.format(self.name, newname))
-		if not isinstance(newname, self._allowed_types):
+		if not isinstance(newname, self._allowed_name_types):
 			logger.warning("Name is unknown type '{}'. Allowed types: {}".format(
 				type(newname).__qualname__,
-				', '.join('%r' % x.__qualname__ for x in self._allowed_types)))
+				', '.join('%r' % x.__qualname__ for x in self._allowed_name_types)))
 		self._name = newname
 
 	def hasname(self):

@@ -22,5 +22,5 @@ class MathObj():
 
 	def __repr__(self):
 		logger.info('math_obj.__repr__ is temporary')
-		return str(self.__dict__)
+		return str(sorted(set(dir(self)) - set(dir(object()))))
 

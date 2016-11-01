@@ -12,7 +12,7 @@ class ValuedObj(Operable):
 	'''
 
 	_default_value = None
-	_allowed_types = (int, float, bool, complex, type(None))
+	_allowed_value_types = (int, float, bool, complex, type(None))
 
 	def __init__(self, *args, value = _default_value, **kwargs):
 		''' Initializes self with 'value'
@@ -28,6 +28,9 @@ class ValuedObj(Operable):
 			logger.warning("Should not instantiate {} directly!".format(type(self).__qualname__))
 
 		super().__init__(*args, **kwargs)
+
+		if value is None:
+			value = self._default_value
 		self.value = value
 
 
@@ -39,10 +42,10 @@ class ValuedObj(Operable):
 
 	@value.setter
 	def value(self, newvalue):
-		if not isinstance(newvalue, self._allowed_types):
+		if not isinstance(newvalue, self._allowed_value_types):
 			logger.warning("Attempted to set value to unknown type '{}'. Allowed types: {}".format(
 				type(newvalue).__qualname__,
-				', '.join('%r' % x.__qualname__ for x in self._allowed_types)))
+				', '.join('%r' % x.__qualname__ for x in self._allowed_value_types)))
 		self._value = newvalue
 
 	@value.deleter
