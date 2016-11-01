@@ -65,6 +65,12 @@ class NamedObj(MathObj):
 
 		return super().__str__()
 
+
+	def __repr__(self):
+		if self.hasname():
+			return '{}(name={!r})'.format(type(self).__qualname__, self.name)
+		assert not self.hasname()
+		return super().__repr__()
 __all__ = ('NamedObj', )
 
 

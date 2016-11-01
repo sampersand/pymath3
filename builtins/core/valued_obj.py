@@ -52,7 +52,7 @@ class ValuedObj(Operable):
 	def value(self):
 		self._value = self._default_value
 
-	def isknown(self):
+	def hasvalue(self):
 		''' Return true if this this class has a value. '''
 		return self.value != self._default_value
 
@@ -60,16 +60,20 @@ class ValuedObj(Operable):
 		''' Returns a string representation of this class.
 
 		Returns:
-			str(self.value)   -- If 'self.isknown()' evaluates to True
-			super().__str__() -- If 'self.isknown()' doesn't evaluate to True
+			str(self.value)   -- If 'self.hasvalue()' evaluates to True
+			super().__str__() -- If 'self.hasvalue()' doesn't evaluate to True
 		'''
-		if self.isknown():
+		if self.hasvalue():
 			return str(self.value)
 
-		assert not self.isknown()
+		assert not self.hasvalue()
 
 		return super().__str__()
-
+	def __repr__(self):
+		if self.hasvalue():
+			return '{}(value={!r})'.format(type(self).__qualname__, self.value)
+		assert not self.hasvalue()
+		return super().__repr__()
 
 __all__ = ('ValuedObj', )
 

@@ -30,13 +30,26 @@ class NamedValuedObj(NamedObj, ValuedObj):
 			ValuedObj.__str__(self) -- If 'self.known()' evaluates to True
 			NamedObj.__str__(self)  -- If 'self.known()' evaluates to False
 		'''
-		if self.isknown():
+		if self.hasvalue():
 			return ValuedObj.__str__(self)
 
-		assert not self.isknown()
+		assert not self.hasvalue()
 		assert True #assert super() type is NamedObj
 
 		return super().__str__()
+
+
+	def __repr__(self):
+		''' Returns the string defined by gen_repr with the varg 'name' and kwarg 'value' '''
+		if self.hasname() and self.hasvalue():
+			return '{}(name={!r}, value={!r})'.format(type(self).__qualname__, self.name, self.value)
+		assert not self.hasname() or not self.hasvalue()
+		return super().__repr__()
+
+
+
+
+
 
 
 
