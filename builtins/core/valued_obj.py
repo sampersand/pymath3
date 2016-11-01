@@ -1,11 +1,7 @@
-from typing import Union, Any, Generic, TypeVar
-
 from . import logger
 from .operable import Operable
 
-T = TypeVar('T')
-
-class ValuedObj(Operable):#, Generic[T]):
+class ValuedObj(Operable):
 	''' Represents an object that can have a value.
 
 	This class is meant to be subclassed, and shouldn't be instanced directly.
@@ -14,50 +10,42 @@ class ValuedObj(Operable):#, Generic[T]):
 	
 	If attempting to directly instantiate a ValuedObj, a warning will be logged.
 	'''
-
-	__this_defaults__ = {'value': None}
-	__update_defaults__(__this_defaults__, __defaults__) # just to be explicit
-
-	__slots__ = __gen_slots__()
-
-	def __init__(self,
-		value: Union[T, type(__defaults__.value)] = __defaults__.value,
-		**kwargs: Any) -> None:
+	_default_value = None
+	def __init__(self, value = _default_value, **kwargs):
 		''' Initializes self with 'value'
 		
 		If attempting to directly instantiate a ValuedObj, a warning will be logged.
 
 		Arguments:
-			value    -- The value of this class. (default: ValuedObj.__defaults__.value)
+			value    -- The value of this class. (default: None)
 			**kwargs -- Extra kwargs, will be ignored for this class.
 		'''
 
 		if __debug__ and type(self) == ValuedObj:
 			logger.warning("Should not instantiate {} directly!".format(type(self).__qualname__))
-		self.value = value
-
 		super().__init__(**kwargs)
+		self.value = value
 
 
 	value = property(doc = "The resulting value of this class")
 
 	@value.getter
-	def value(self) -> Union[T, type(__defaults__.value)]:
+	def value(self):
 		return self._value
 
 	@value.setter
-	def value(self, val: T) -> None:
+	def value(self, val):
 		self._value = val
 
 	@value.deleter
-	def value(self) -> None:
-		self._value = self.__defaults__.value
+	def value(self):
+		self._value = self._default_value
 
-	def isknown(self) -> bool:
+	def isknown(self):
 		''' Return true if this this class has a value. '''
-		return self.value != self.__defaults__.value
+		return self.value != self._default_value
 
-	def __str__(self) -> str:
+	def __str__(self):
 		''' Returns a string representation of this class.
 
 		Returns:
@@ -73,3 +61,6 @@ class ValuedObj(Operable):#, Generic[T]):
 
 
 __all__ = ('ValuedObj', )
+
+
+
