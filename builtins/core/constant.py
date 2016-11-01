@@ -9,17 +9,10 @@ class Constant(ValuedObj):
 	robust.
 	'''
 
-	__this_defaults__ = {
-		'value': 0,
-		'allowed_types': (int, float, bool, complex)
-	}
-	__update_defaults__(__this_defaults__, __defaults__) # just to be explicit
+	_default_value = 0
+	_allowed_types = (int, float, bool, complex)
 
-	__slots__ = __gen_slots__()
-
-	def __init__(self,
-				value = __defaults__.value,
-				**kwargs) -> None:
+	def __init__(self, value = _default_value, **kwargs):
 		''' Instantiates self.
 
 		If value is not of __defaults__.allowed_types, a warning will be logged.
@@ -31,10 +24,9 @@ class Constant(ValuedObj):
 			None
 		'''
 
-		if not isinstance(value, self.__defaults__.allowed_types):
-			logger.warning('Recieved invalid type for value: {}. Allowed types: {}'.format(
-				type(value),
-				self.__defaults__.allowed_types))
+		if not isinstance(value, self._allowed_types):
+			logger.warning('Recieved an unknown type for value: {}. Allowed types: {}'.format(
+				type(value), self._allowed_types))
 		super().__init__(value = value, **kwargs)
 
 class UserConstant(UserObj, Constant):
@@ -44,7 +36,7 @@ class UserConstant(UserObj, Constant):
 	pass keywords to the constructor) but shouldn't be used when robustness is necessary.
 	'''
 
-	def __init__(self, value: __defaults__.allowed_types = __defaults__.value) -> None:
+	def __init__(self, value = Constant._default_value):
 		''' Initiates self.
 		
 		This function passes 'value' to Constant's constructor, and nothing else.
@@ -55,14 +47,3 @@ class UserConstant(UserObj, Constant):
 			None
 		'''
 		super().__init__(value = value)
-
-	def __repr__(self):
-		''' Returns the string defined by gen_repr with the varg 'value'. '''
-		return self.gen_repr(self.value)
-
-
-
-
-
-
-

@@ -1,5 +1,3 @@
-from typing import Any
-
 from . import logger
 from .named_obj import NamedObj
 from .valued_obj import ValuedObj
@@ -11,8 +9,7 @@ class NamedValuedObj(NamedObj, ValuedObj):
 
 	If attempting to directly instantiate a NamedValuedObj, a warning will be logged.
 	'''
-	__slots__ = __gen_slots__()
-	def __init__(self, **kwargs: Any) -> None:
+	def __init__(self, **kwargs):
 		''' Initializes self 
 		
 		If attempting to directly instantiate a NamedValuedObj, a warning will be logged.
@@ -26,7 +23,7 @@ class NamedValuedObj(NamedObj, ValuedObj):
 		super().__init__(**kwargs)
 
 
-	def __str__(self) -> str:
+	def __str__(self):
 		''' Returns a string representation of this class.
 
 		Returns:
@@ -40,8 +37,3 @@ class NamedValuedObj(NamedObj, ValuedObj):
 		assert True #assert super() type is NamedObj
 
 		return super().__str__()
-
-	def __repr__(self) -> str:
-		''' Returns the string defined by gen_repr with kwargs 'name' and 'value'. '''
-		return self.gen_repr(name  = (self.name, self.DEFAULT_NAME),
-							 value = (self.value, self.DEFAULT_VALUE))
