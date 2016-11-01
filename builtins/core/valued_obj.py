@@ -8,7 +8,7 @@ class ValuedObj(Operable):
 
 	See Constant and Variable for builtin subclasses for this.
 	
-	If attempting to directly instantiate a ValuedObj, a warning will be logged.
+	A warning will be logged if a ValuedObj is attempted to be instanced directly.
 	'''
 
 	_default_value = None
@@ -17,11 +17,14 @@ class ValuedObj(Operable):
 	def __init__(self, *args, value = _default_value, **kwargs):
 		''' Initializes self with 'value'
 		
-		If attempting to directly instantiate a ValuedObj, a warning will be logged.
+		A warning will be logged if a ValuedObj is attempted to be instanced directly.
 
 		Arguments:
+			*args    -- Ignored
 			value    -- The value of this class. (default: None)
-			**kwargs -- Extra kwargs, will be ignored for this class.
+			**kwargs -- Ignored
+		Returns:
+			None
 		'''
 
 		if __debug__ and type(self) == ValuedObj:

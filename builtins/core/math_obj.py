@@ -3,12 +3,12 @@ class MathObj():
 	'''
 	Base class for all PyMath Objects.
 
-	If attempting to directly instantiate a ValuedObj, a warning will be logged.
+	A warning will be logged if a ValuedObj is attempted to be instanced directly.
 	'''
 	def __init__(self, *args, **kwargs):
 		''' Instantiates self.
 
-		If attempting to directly instantiate a MathObj, a warning will be logged.
+		A warning will be logged if a MathObj is attempted to be instanced directly.
 
 		Arguments:
 			**kwargs -- Extra kwargs, will be ignored for this class.

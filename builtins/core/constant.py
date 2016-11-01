@@ -29,3 +29,10 @@ class UserConstant(UserObj, Constant):
 			None
 		'''
 		super().__init__(value = value)
+
+
+	def __repr__(self):
+		''' Returns the string defined by gen_repr with the varg 'name' and kwarg 'value' '''
+		if self.hasvalue():
+			return '{}({!r})'.format(type(self).__qualname__, self.value)
+		return super().__repr__()

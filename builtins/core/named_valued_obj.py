@@ -1,4 +1,6 @@
+from pymath3.utils.inherit_doc import inheritdoc
 from . import logger
+from .math_obj import MathObj
 from .named_obj import NamedObj
 from .valued_obj import ValuedObj
 
@@ -7,17 +9,10 @@ class NamedValuedObj(NamedObj, ValuedObj):
 
 	This class is meant to be subclassed, and shouldn't be instanced directly.
 
-	If attempting to directly instantiate a NamedValuedObj, a warning will be logged.
+	A warning will be logged if a NamedValuedObj is attempted to be instanced directly.
 	'''
+	@inheritdoc(MathObj)
 	def __init__(self, *args, **kwargs):
-		''' Initializes self 
-		
-		If attempting to directly instantiate a NamedValuedObj, a warning will be logged.
-
-		Arguments:
-			**kwargs -- Extra kwargs, will be ignored for this class.
-		'''
-
 		if __debug__ and type(self) == NamedValuedObj:
 			logger.warning("Should not instantiate {} directly!".format(type(self).__qualname__))
 		super().__init__(*args, **kwargs)
@@ -39,12 +34,13 @@ class NamedValuedObj(NamedObj, ValuedObj):
 		return super().__str__()
 
 
+	@inheritdoc(NamedObj)
 	def __repr__(self):
-		''' Returns the string defined by gen_repr with the varg 'name' and kwarg 'value' '''
 		if self.hasname() and self.hasvalue():
 			return '{}(name={!r}, value={!r})'.format(type(self).__qualname__, self.name, self.value)
 		assert not self.hasname() or not self.hasvalue()
 		return super().__repr__()
+
 
 
 

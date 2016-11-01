@@ -7,7 +7,7 @@ class NamedObj(MathObj):
 
 	See Constant and Variable for builtin subclasses for this.
 	
-	If attempting to directly instantiate a NamedObj, a warning will be logged.
+	A warning will be logged if a NamedObj is attempted to be instanced directly.
 	'''
 
 	_default_name = None
@@ -15,7 +15,7 @@ class NamedObj(MathObj):
 	def __init__(self, *args, name = None, **kwargs):
 		''' Initializes self with 'name'
 		
-		If attempting to directly instantiate a NamedObj, a warning will be logged.
+		A warning will be logged if a NamedObj is attempted to be instanced directly.
 
 		Arguments:
 			name    -- The name of this class. (default: None)
