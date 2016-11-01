@@ -38,12 +38,12 @@ class ValuedObj(Operable):
 		return self._value
 
 	@value.setter
-	def value(self, val):
-		if not isinstance(val, self._allowed_types):
-			logger.warning("Value is unknown type '{}'. Allowed types: {}".format(
-				type(val).__qualname__,
+	def value(self, newvalue):
+		if not isinstance(newvalue, self._allowed_types):
+			logger.warning("Attempted to set value to unknown type '{}'. Allowed types: {}".format(
+				type(newvalue).__qualname__,
 				', '.join('%r' % x.__qualname__ for x in self._allowed_types)))
-		self._value = val
+		self._value = newvalue
 
 	@value.deleter
 	def value(self):

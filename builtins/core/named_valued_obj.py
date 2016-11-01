@@ -9,7 +9,7 @@ class NamedValuedObj(NamedObj, ValuedObj):
 
 	If attempting to directly instantiate a NamedValuedObj, a warning will be logged.
 	'''
-	def __init__(self, **kwargs):
+	def __init__(self, *args, **kwargs):
 		''' Initializes self 
 		
 		If attempting to directly instantiate a NamedValuedObj, a warning will be logged.
@@ -20,7 +20,7 @@ class NamedValuedObj(NamedObj, ValuedObj):
 
 		if __debug__ and type(self) == NamedValuedObj:
 			logger.warning("Should not instantiate {} directly!".format(type(self).__qualname__))
-		super().__init__(**kwargs)
+		super().__init__(*args, **kwargs)
 
 
 	def __str__(self):
@@ -37,3 +37,6 @@ class NamedValuedObj(NamedObj, ValuedObj):
 		assert True #assert super() type is NamedObj
 
 		return super().__str__()
+
+
+

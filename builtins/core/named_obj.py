@@ -25,13 +25,8 @@ class NamedObj(MathObj):
 		if __debug__ and type(self) == NamedObj:
 			logger.warning("Should not instantiate {} directly!".format(type(self).__qualname__))
 
-		if not isinstance(name, self._allowed_types):
-			logger.warning("Name is unknown type '{}'. Allowed types: {}".format(
-				type(name).__qualname__,
-				', '.join('%r' % x.__qualname__ for x in self._allowed_types)))
-
 		super().__init__(*args, **kwargs)
-		self._name = name #maybe make this _name?
+		self.name = name
 
 
 	name = property(doc = "The name of this class")
@@ -39,6 +34,16 @@ class NamedObj(MathObj):
 	@name.getter
 	def name(self):
 		return self._name
+
+	@name.setter
+	def name(self, newname):
+		if hasattr(self, '_name'):
+			logger.info('Overriding name {} with {}'.format(self.name, newname))
+		if not isinstance(newname, self._allowed_types):
+			logger.warning("Name is unknown type '{}'. Allowed types: {}".format(
+				type(newname).__qualname__,
+				', '.join('%r' % x.__qualname__ for x in self._allowed_types)))
+		self._name = newname
 
 	def hasname(self):
 		''' Return true if this this class has a name. '''

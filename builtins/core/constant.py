@@ -8,7 +8,7 @@ class Constant(ValuedObj):
 	UserConstant can be substituted if ease of use is required. However, Constant is much more 
 	robust.
 	'''
-
+	__slots__ = ('_value', )
 	_default_value = 0
 
 class UserConstant(UserObj, Constant):
