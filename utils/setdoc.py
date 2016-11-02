@@ -1,20 +1,36 @@
 from inspect import isfunction
 from . import logger, from_stack, tq
-class DocMeta(type):
-	def __init__(cls, name, bases, attrs, **kwargs):
-		super().__init__(name, bases, attrs, **kwargs)
-
-# def setdoc_unstable(parent, *, TODO: 'THIS'):
-# 	__docs__ = from_stack('__docs__', 2) if __docs__ is None else __docs__
-# 	### Check parent
-# 	warntype(parent, type, 'parent')
-# 	assert isinstance(parent, type)
 
 def setdoc(*, __docs__ = None, formats = {}): #also called 'setdoc_unstable'
 	if __docs__ is None:
 		__docs__ = from_stack('__docs__', 2)
 	return setdoc_func(__docs__, formats = formats)
+
 def setdoc_func(__docs__, *, formats = {}):
+	""" Updates the '__doc__' attribute of the captured func.
+
+	The '__doc__' is modified in-place.
+
+	This returns a function that accepts a single argument - the function to update
+
+	Usage:
+		__docs__ = {'foo': 'docs for foo'}
+
+		@setdoc_func(__docs__)
+		def foo(): ...
+
+	 or
+		def foo(): ...
+		foo = setdoc_func(__docs__)(foo)
+
+	Arguments:
+		__docs__  -- The dictionary of names to default __docs__ 
+		func      -- The function of which to update the '__doc__' attribute.
+		func_name -- The name of 'func' (used as a key for __docs__)
+		formats   -- Optional values used in '__docs__[func_name].format(formats)' (default: {})
+	Returns:
+		A function that 'captures' a function, which then returns the captured function.
+	"""
 	def capture(func):
 		if not isfunction(func):
 			raise TypeError("'func' must be a function, not {}".format(tq(func)))
@@ -23,8 +39,23 @@ def setdoc_func(__docs__, *, formats = {}):
 		assert isinstance(func_name, str), type(func_name)
 		return setdoc_stable(__docs__, func, func_name, formats)
 	return capture
-def setdoc_stable(__docs__, func, func_name, formats = {}):
 
+def setdoc_stable(__docs__, func, func_name, formats = {}):
+	""" Updates the '__doc__' attribtue of func
+
+	This function is meant to be as explicit as possible. Use 'setdoc_func' and 'setdoc' to infer
+	arguments
+
+	The '__doc__' is modified in-place.
+
+	Arguments:
+		__docs__  -- The dictionary of names to default __docs__ 
+		func      -- The function of which to update the '__doc__' attribute.
+		func_name -- The name of 'func' (used as a key for __docs__)
+		formats   -- Optional values used in '__docs__[func_name].format(formats)' (default: {})
+	Returns:
+		The 'func' parameter.
+	"""
 	### check docs
 	if not isinstance(__docs__, dict):
 		logger.debug("Unexpected type '{}' for __docs__".format(tq(__docs__)))
@@ -60,36 +91,3 @@ def setdoc_stable(__docs__, func, func_name, formats = {}):
 		logger.error("Unable to set __doc__ for func '{}' (func_name={})".format(func, func_name))
 
 	return func
-
-
-
-
-class parentclass(metaclass=DocMeta):
-	def somefunc(self, a):
-		'''documentation for somefunc'''
-		return a
-class foo(parentclass):
-	__docs__ = {
-		'somefunc': 'blargh'
-	}
-
-
-	@setdoc()
-	def somefunc(self, a):
-		return a + 1
-
-print(foo.somefunc.__doc__, 'a')
-
-
-
-
-
-
-
-
-
-
-
-
-# quit()
-#
