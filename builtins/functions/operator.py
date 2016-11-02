@@ -2,15 +2,18 @@ from .unseeded_function import UnseededFunction
 from .seeded_operator import SeededOperator
 class Operator(UnseededFunction):
 	seeded_type = SeededOperator
-	def __init__(self, priority, **kwargs):
-		self.priority = priority
+	priority = None
+
+	def __init__(self, **kwargs):
 		super().__init__(**kwargs)
+		assert hasattr(self, 'priority') and self.priority is not None
 
 	def format(self, *args):
 		if self.arglen:
 			pass
 		print(self.arglen)
 		return ''
+
 class BinaryOperator(Operator):
 	def __init__(self, **kwargs):
 		super().__init__(**kwargs)
@@ -24,8 +27,8 @@ class BinaryOperator(Operator):
 		return '{0}{1}{2}{1}{3}'.format(l, self._space, self.name, r)
 
 class AddOperator(BinaryOperator):
-	def __init__(self):
-		super().__init__(priority = 1, name = '+')
+	priority = 1
+	name = '+'
 
 	base_func = Operator.base_func
 	@base_func.getter
@@ -38,13 +41,26 @@ class AddOperator(BinaryOperator):
 			assert hasattr(r, 'value')
 			return l.value + r.value
 		return adder
+class MulOperator(BinaryOperator):
+	priority = 
 
 
+
+8: <, <=, >, >=, !=, ==
+7: |
+6: ^
+5: &
+4: <<, >>
+3: +, -
+2: *, @, /, //, %
+1: +x, -x, ~x
+0: **
 
 
 def gen_opers():
 	ret = {}
 	ret['__add__'] = AddOperator()
+	ret['__mul__'] = MulOperator()
 	return ret
 operators = gen_opers()
 

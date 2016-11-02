@@ -33,6 +33,8 @@ class Operable(MathObj):
 
 	def __add__(self, other):
 		return self._do('__add__', other)
+	def __mul__(self, other):
+		return self._do('__mul__', other)
 
 
 
