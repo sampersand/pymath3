@@ -16,3 +16,7 @@ def gen_opers():
 	ret = {}
 	ret['__add__'] = AddOperator()
 	return ret
+operators = gen_opers()
+
+
+
