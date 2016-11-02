@@ -27,7 +27,7 @@ class ValuedObj(Operable):
 			None
 		'''
 
-		if __debug__ and type(self) == ValuedObj:
+		if type(self) == ValuedObj:
 			logger.warning("Should not instantiate {} directly!".format(type(self).__qualname__))
 
 		super().__init__(*args, **kwargs)

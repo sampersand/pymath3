@@ -22,7 +22,7 @@ class NamedObj(MathObj):
 			**kwargs -- Extra kwargs, will be ignored for this class.
 		'''
 
-		if __debug__ and type(self) == NamedObj:
+		if type(self) == NamedObj:
 			logger.warning("Should not instantiate {} directly!".format(type(self).__qualname__))
 
 		super().__init__(*args, **kwargs)

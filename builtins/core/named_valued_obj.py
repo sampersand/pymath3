@@ -13,7 +13,7 @@ class NamedValuedObj(NamedObj, ValuedObj):
 	'''
 	@inheritdoc(MathObj)
 	def __init__(self, *args, **kwargs):
-		if __debug__ and type(self) == NamedValuedObj:
+		if type(self) == NamedValuedObj:
 			logger.warning("Should not instantiate {} directly!".format(type(self).__qualname__))
 		super().__init__(*args, **kwargs)
 

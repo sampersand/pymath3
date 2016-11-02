@@ -1,4 +1,6 @@
+import importlib
 from .math_obj import MathObj
+operators = None
 class Operable(MathObj):
 	def __init__(self, *args, **kwargs):
 		''' Instantiates self.
@@ -11,14 +13,16 @@ class Operable(MathObj):
 		Returns:
 			None
 		'''
-		if __debug__ and type(self) == Operable:
+		if type(self) == Operable:
 			logger.warning("Should not instantiate {} directly!".format(type(self).__qualname__))
 
 		super().__init__(*args, **kwargs)
 
 
 	def _do(self, func, *args):
-		from pymath3.builtins.functions import operators
+		global operators
+		if not operators:
+			operators = importlib.import_module('.functions.operator').operators
 		return operators[func](self, *args)
 	def __add__(self, other):
 		return self._do('__add__', other)

@@ -92,7 +92,7 @@ class DefaultMeta(type):
 
 		for base in reversed(bases): #reversed so the furthest away in the MRO is overriden
 			if hasattr(base, '__defaults__'):
-				if __debug__ and not isinstance(base.__defaults__, dict):
+				if not isinstance(base.__defaults__, dict):
 					logger.warning("Class {}'s __defaults__ (type: {}) is not an instance of dict".format(
 						base.__qualname__, type(base.__defaults__).__qualname__))
 				assert isinstance(base.__defaults__, dict)

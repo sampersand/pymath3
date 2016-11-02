@@ -27,7 +27,7 @@ class MathObj():
 
 
 	def __init__(self, *args, **kwargs):
-		if __debug__ and type(self) == MathObj:
+		if type(self) == MathObj:
 			logger.warning("Should not instantiate {} directly!".format(type(self).__qualname__))
 		super().__init__(*args, **kwargs)
 

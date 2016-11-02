@@ -1,6 +1,6 @@
 import logging
 logger = logging.getLogger(__name__)
-from .immutable import immutable
+def tq(obj):
+	return type(obj).__qualname__
 from .from_stack import from_stack
-from .convert import convert, auto
-from .default_meta import DefaultMeta
+from .doc_meta import DocMeta, setdoc
