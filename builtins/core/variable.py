@@ -48,3 +48,5 @@ class UserVariable(UserObj, Variable, is_pymath_userobj=True):
 		else:
 			assert not self.hasname() and not self.hasvalue()
 			return super().__repr__()
+
+__slots__ = ('_value', '_name')

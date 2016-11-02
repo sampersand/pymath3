@@ -22,7 +22,7 @@ class Operable(MathObj):
 		'''
 
 		__class__.checktype(self)
-		super().__init__(*args, **kwargs)
+		super().__init__(**kwargs)
 
 
 	def _do(self, func, *args):

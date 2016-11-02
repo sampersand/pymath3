@@ -1,6 +1,26 @@
-from . import NamedValuedObj
-class SeededFunction(NamedValuedObj):
-	def __init__(self, unseeded_base, base_args, **kwargs):
+from . import ValuedObj, scrub, MathObj
+class SeededFunction(ValuedObj):
+	def __init__(self, unseeded_base, call_args, **kwargs):
 		self.unseeded_base = unseeded_base
-		self.base_args = base_args
+		self.call_args = tuple(map(scrub, call_args))
+		assert self.unseeded_base
+		assert all(isinstance(arg, MathObj) for arg in self)
 		super().__init__(**kwargs)
+
+	def __iter__(self):
+		return iter(self.call_args)
+
+	value = ValuedObj.value
+	@value.getter
+	def value(self):
+		return self.unseeded_base.base_func(*self)
+	def hasvalue(self):
+		if __debug__:
+			for x in self:
+				assert hasattr(x, 'hasvalue')
+		return all(a.hasvalue() for a in self) and self.value is not None
+
+	def __str__(self):
+		if self.hasvalue():
+			return str(self.value)
+		return '{}({})'.format(self.unseeded_base.name, *self)

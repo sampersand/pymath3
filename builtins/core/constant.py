@@ -33,3 +33,8 @@ class UserConstant(UserObj, Constant, is_pymath_userobj=True):
 		if self.hasvalue():
 			return '{}({!r})'.format(type(self).__qualname__, self.value)
 		return super().__repr__()
+
+	__slots__ = ('_value', )
+
+
+

@@ -21,3 +21,5 @@ class UserObj(MathObj):
 	def __init_subclass__(*, is_pymath_userobj = False, **kwargs):
 		if not is_pymath_userobj:
 			raise TypeError("UserObj's children cannot be subclassed!")
+
+	__slots__ = ()

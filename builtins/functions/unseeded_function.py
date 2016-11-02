@@ -19,10 +19,10 @@ class UnseededFunction(NamedObj):
 		self.base_func = base_func
 		self.body_str = body_str
 		self.args_str = args_str
-		self.arglen = arglen
+		self._arglen = arglen
 
 	def __call__(self, *args):
-		return self.seeded_type(unseeded_base = self, base_args = args)
+		return self.seeded_type(unseeded_base = self, call_args = args)
 
 	base_func = property(doc = "The function this UnseededFunction is built around.")
 
@@ -33,5 +33,14 @@ class UnseededFunction(NamedObj):
 	@base_func.setter
 	def base_func(self, new_base_func):
 		self._base_func = new_base_func
+
+	@property
+	def arglen(self):
+		if self._arglen is not self._default_func_arglen:
+			return self._arglen
+		assert self.base_func is not None, self.base_func
+		return self.base_func.__code__.co_argcount
+
+
 
 

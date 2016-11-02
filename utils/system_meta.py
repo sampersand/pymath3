@@ -1,14 +1,9 @@
-import importlib
-MathObj = None
+from . import scrub
 class _system_locals(dict):
 	BUILTIN_OBJNAMES = {'__module__', '__qualname__'}
 	def __setitem__(self, name, value):
 		if name not in self and name not in self.BUILTIN_OBJNAMES:
-			print('name:', name)
-			global MathObj
-			if not MathObj:
-				MathObj = importlib.import_module('pymath3.builtins.core.math_obj').MathObj
-			value = MathObj.scrub(value, name = name)
+			value = scrub(value, name = name)
 
 		super().__setitem__(name, value)
 class SystemMeta(type):
