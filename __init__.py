@@ -6,8 +6,8 @@ logging.basicConfig(level = LOGGING_LEVEL, format = LOGGING_FORMAT, style = LOGG
 
 logger = logging.getLogger(__name__)
 
-import pymath3.utils
-tq = pymath3.utils.tq
+import .utils
+tq = .utils.tq
+SystemMeta = .utils.SystemMeta
 from .builtins import *
-
 __all__ = [x for x in list(locals()) if x[0] != '_']
