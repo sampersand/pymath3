@@ -27,9 +27,7 @@ class ValuedObj(Operable):
 			None
 		'''
 
-		if type(self) == ValuedObj:
-			logger.warning("Should not instantiate {} directly!".format(type(self).__qualname__))
-
+		__class__.checktype(self)
 		super().__init__(*args, **kwargs)
 
 		if value is None:
@@ -73,6 +71,7 @@ class ValuedObj(Operable):
 		assert not self.hasvalue()
 
 		return super().__str__()
+
 	def __repr__(self):
 		if self.hasvalue():
 			return '{}(value={!r})'.format(type(self).__qualname__, self.value)

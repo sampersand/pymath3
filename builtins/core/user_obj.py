@@ -14,7 +14,9 @@ class UserObj(MathObj):
 	This class is meant to be subclassed, and shouldn't be instanced directly. If attempted, a
 	warning will be logged.
 	'''
-	
+	def __init__(self, *args, **kwargs):
+		__class__.checktype(self)
+		super().__init__(*args, **kwargs)
 	@staticmethod
 	def __init_subclass__(*, is_pymath_userobj = False, **kwargs):
 		if not is_pymath_userobj:

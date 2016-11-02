@@ -9,6 +9,7 @@ class NamedObj(MathObj):
 
 	_default_name = None
 	_allowed_name_types = (str, bytes, type(None))
+
 	def __init__(self, *args, name = None, **kwargs):
 		'''Initialize self.
 
@@ -23,9 +24,7 @@ class NamedObj(MathObj):
 			None
 		'''
 
-		if type(self) == NamedObj:
-			logger.warning("Should not instantiate {} directly!".format(type(self).__qualname__))
-
+		__class__.checktype(self)
 		super().__init__(*args, **kwargs)
 		if name is None:
 			name = self._default_name

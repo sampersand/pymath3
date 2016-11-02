@@ -21,9 +21,7 @@ class Operable(MathObj):
 			None
 		'''
 
-		if type(self) == __class__:
-			logger.warning("Should not instantiate {} directly!".format(type(self).__qualname__))
-
+		__class__.checktype(self)
 		super().__init__(*args, **kwargs)
 
 
@@ -35,3 +33,25 @@ class Operable(MathObj):
 
 	def __add__(self, other):
 		return self._do('__add__', other)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

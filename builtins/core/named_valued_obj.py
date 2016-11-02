@@ -23,8 +23,7 @@ class NamedValuedObj(NamedObj, ValuedObj):
 			None
 		'''
 
-		if type(self) == NamedValuedObj:
-			logger.warning("Should not instantiate {} directly!".format(type(self).__qualname__))
+		__class__.checktype(self)
 		super().__init__(*args, **kwargs)
 
 
