@@ -47,3 +47,18 @@ class MathObj():
 		return True
 
 
+	@staticmethod
+	def scrub(arg, **kwargs): # this is _not_ exhaustive
+		if isinstance(arg, MathObj):
+			return arg
+		from .variable import Variable
+
+		if isinstance(arg, Variable._allowed_value_types):
+			return Variable(value = arg, **kwargs)
+
+		raise TypeError(type(arg))
+
+
+
+
+
