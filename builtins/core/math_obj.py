@@ -1,37 +1,36 @@
-# from . import logger
+from . import logger
 class MathObj():
 	'''
 	Base class for all PyMath Objects.
 
-	A warning will be logged if a MathObj is attempted to be instanced directly.
+	This class is meant to be subclassed, and shouldn't be instanced directly. If attempted, a
+	warning will be logged.
 	'''
 
-	__doc_defaults__ = {
-		'__init__': '''
-			Instantiates self.
-
-			A warning will be logged if 'type(self) == {ctype}' evaluates to true.
-
-			Arguments:
-				*args    -- Ignored{kwonly_args}
-				**kwargs -- Ignored
-			Returns:
-				None
-			''',
-		'__repr__': '''No doc lol noob
-		''',
-	}
-
-
-
-
-
 	def __init__(self, *args, **kwargs):
-		if type(self) == MathObj:
-			logger.warning("Should not instantiate {} directly!".format(type(self).__qualname__))
+		'''Initialize self.
+
+		This class is meant to be subclassed, and shouldn't be instanced directly. If attempted, a
+		warning will be logged.
+
+		Arguments:
+			*args    -- Ignored
+			**kwargs -- Ignored
+		Returns:
+			None
+		'''
+
+		__class__.checktype(self)
 		super().__init__(*args, **kwargs)
 
 	def __repr__(self):
 		return '{}()'.format(type(self).__qualname__)
 
+	@classmethod
+	def checktype(cls, self):
+		''' Check to see if self.__class__ is equal to cls, and log a warning if they are.
 
+		2ty3
+		'''
+		if type(self) == cls:
+			logger.warning("Should not instantiate {} directly!".format(cls)

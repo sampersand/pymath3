@@ -3,23 +3,24 @@ from .math_obj import MathObj
 class NamedObj(MathObj):
 	''' Represents an object that can have a name.
 
-	This class is meant to be subclassed, and shouldn't be instanced directly.
-
-	See Constant and Variable for builtin subclasses for this.
-	
-	A warning will be logged if a NamedObj is attempted to be instanced directly.
+	This class is meant to be subclassed, and shouldn't be instanced directly. If attempted, a
+	warning will be logged.
 	'''
 
 	_default_name = None
 	_allowed_name_types = (str, bytes, type(None))
 	def __init__(self, *args, name = None, **kwargs):
-		''' Initializes self with 'name'
-		
-		A warning will be logged if a NamedObj is attempted to be instanced directly.
+		'''Initialize self.
+
+		This class is meant to be subclassed, and shouldn't be instanced directly. If attempted, a
+		warning will be logged.
 
 		Arguments:
-			name    -- The name of this class. (default: None)
-			**kwargs -- Extra kwargs, will be ignored for this class.
+			*args    -- Ignored
+			name     -- The name of this class. (default: None)
+			**kwargs -- Ignored
+		Returns:
+			None
 		'''
 
 		if type(self) == NamedObj:

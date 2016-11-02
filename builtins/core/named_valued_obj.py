@@ -1,4 +1,3 @@
-from pymath3.utils.inherit_doc import inheritdoc
 from . import logger
 from .math_obj import MathObj
 from .named_obj import NamedObj
@@ -7,12 +6,23 @@ from .valued_obj import ValuedObj
 class NamedValuedObj(NamedObj, ValuedObj):
 	''' Represents an object that can have both a name and a value.
 
-	This class is meant to be subclassed, and shouldn't be instanced directly.
-
-	A warning will be logged if a NamedValuedObj is attempted to be instanced directly.
+	This class is meant to be subclassed, and shouldn't be instanced directly. If attempted, a
+	warning will be logged.
 	'''
-	@inheritdoc(MathObj)
+
 	def __init__(self, *args, **kwargs):
+		'''Initialize self.
+
+		This class is meant to be subclassed, and shouldn't be instanced directly. If attempted, a
+		warning will be logged.
+
+		Arguments:
+			*args    -- Ignored
+			**kwargs -- Ignored
+		Returns:
+			None
+		'''
+
 		if type(self) == NamedValuedObj:
 			logger.warning("Should not instantiate {} directly!".format(type(self).__qualname__))
 		super().__init__(*args, **kwargs)
@@ -34,7 +44,6 @@ class NamedValuedObj(NamedObj, ValuedObj):
 		return super().__str__()
 
 
-	@inheritdoc(NamedObj)
 	def __repr__(self):
 		if self.hasname() and self.hasvalue():
 			return '{}(name={!r}, value={!r})'.format(type(self).__qualname__, self.name, self.value)

@@ -7,4 +7,15 @@ class UserObj(MathObj):
 	pass them as keyword arguments to the class they are subclassing.
 
 	This class can also use regex to find optional values, but this can be disabled.
+
+	Subclasses of this should not be extended. To inherit, extend the non-user class they are
+	referincing.
+
+	This class is meant to be subclassed, and shouldn't be instanced directly. If attempted, a
+	warning will be logged.
 	'''
+	
+	@staticmethod
+	def __init_subclass__(*, is_pymath_userobj = False, **kwargs):
+		if not is_pymath_userobj:
+			raise TypeError("UserObj's children cannot be subclassed!")

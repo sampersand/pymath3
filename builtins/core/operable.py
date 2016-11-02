@@ -1,11 +1,18 @@
 import importlib
 from .math_obj import MathObj
-operators = None
+operators = None #will be 'lazily' imported
 class Operable(MathObj):
+	''' A class representing an operable object, such as a number or function.
+
+	This class is meant to be subclassed, and shouldn't be instanced directly. If attempted, a
+	warning will be logged.
+	'''
+
 	def __init__(self, *args, **kwargs):
 		''' Instantiates self.
 
-		A warning will be logged if an Operable is attempted to be instanced directly.
+		This class is meant to be subclassed, and shouldn't be instanced directly. If attempted, a
+		warning will be logged.
 
 		Arguments:
 			*args    -- Ignored
@@ -13,7 +20,8 @@ class Operable(MathObj):
 		Returns:
 			None
 		'''
-		if type(self) == Operable:
+
+		if type(self) == __class__:
 			logger.warning("Should not instantiate {} directly!".format(type(self).__qualname__))
 
 		super().__init__(*args, **kwargs)
@@ -24,5 +32,6 @@ class Operable(MathObj):
 		if not operators:
 			operators = importlib.import_module('.functions.operator').operators
 		return operators[func](self, *args)
+
 	def __add__(self, other):
 		return self._do('__add__', other)

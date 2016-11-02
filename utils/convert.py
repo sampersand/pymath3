@@ -83,8 +83,8 @@ def _update_keywords(func, defaults):
 # 	return defaults[func.__name__]
 
 def convert(defaults, func):
-	""" Replace all 'autos' of a function with their corresponding values in defaults.
-	"""
+	''' Replace all 'autos' of a function with their corresponding values in defaults.
+	'''
 
 	if not isinstance(defaults, dict):
 		logger.warning('Recieved non-dict for defaults: {}'.format(type(defaults)))

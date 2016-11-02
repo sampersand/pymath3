@@ -4,11 +4,10 @@ from .operable import Operable
 class ValuedObj(Operable):
 	''' Represents an object that can have a value.
 
-	This class is meant to be subclassed, and shouldn't be instanced directly.
+	This class is meant to be subclassed, and shouldn't be instanced directly. If attempted, a
+	warning will be logged.
 
 	See Constant and Variable for builtin subclasses for this.
-	
-	A warning will be logged if a ValuedObj is attempted to be instanced directly.
 	'''
 
 	_default_value = None
@@ -17,7 +16,8 @@ class ValuedObj(Operable):
 	def __init__(self, *args, value = _default_value, **kwargs):
 		''' Initializes self with 'value'
 		
-		A warning will be logged if a ValuedObj is attempted to be instanced directly.
+		This class is meant to be subclassed, and shouldn't be instanced directly. If attempted, a
+		warning will be logged.
 
 		Arguments:
 			*args    -- Ignored
@@ -66,6 +66,7 @@ class ValuedObj(Operable):
 			str(self.value)   -- If 'self.hasvalue()' evaluates to True
 			super().__str__() -- If 'self.hasvalue()' doesn't evaluate to True
 		'''
+
 		if self.hasvalue():
 			return str(self.value)
 
