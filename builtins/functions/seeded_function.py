@@ -24,5 +24,9 @@ class SeededFunction(ValuedObj):
 		if self.hasvalue():
 			return str(self.value)
 		return '{}({})'.format(self.unseeded_base.name, *self)
-	def __repr__(self):
-		return 
+
+	def _gen_repr(self, *args, **kwargs):
+		return super()._gen_repr(*args,
+		    unseeded_base = self.unseeded_base,
+		    call_args = self.call_args,
+		    **kwargs)

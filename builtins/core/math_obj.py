@@ -1,4 +1,4 @@
-from . import logger
+from . import logger, tq
 class MathObj():
 	'''
 	Base class for all PyMath Objects.
@@ -23,10 +23,19 @@ class MathObj():
 		__class__.checktype(self)
 		super().__init__(*args, **kwargs)
 
+
+
+	def _gen_repr(self, *args, **kwargs):
+		ret = type(self).__qualname__ + '('
+		if args:
+			ret += repr(args)[1:-1]
+		return '{}({}{}{})'.format(tq(self), 
+		    ', '.join(repr(x) for x in args),
+			', ' if args and kwargs else '',
+			', '.join('{}={}'.format(key, value) for key, value in kwargs.items())
+			)
 	def __repr__(self):
-		if type(self) != MathObj:
-			logger.warning("Class type {} doesn't implement it's own __repr__!".format(type(self).__qualname__))
-		return '{}()'.format(type(self).__qualname__)
+		return self._gen_repr()
 
 	@classmethod
 	def checktype(cls, self):
@@ -47,3 +56,17 @@ class MathObj():
 			logger.warning("Should not instantiate {} directly!".format(cls))
 			return False
 		return True
+
+
+
+
+
+
+
+
+
+
+
+
+
+
