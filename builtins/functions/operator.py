@@ -1,3 +1,4 @@
+from . import classproperty
 from .unseeded_function import UnseededFunction
 from .seeded_operator import SeededOperator
 class Operator(UnseededFunction):
@@ -28,7 +29,7 @@ class BinaryOperator(Operator):
 		super().__init__(**kwargs)
 		assert self.arglen == 2
 
-	@classmethod
+	@classproperty
 	def _space(cls):
 		return ' ' if cls.NAME in set('+-') else ''
 
@@ -37,13 +38,17 @@ class BinaryOperator(Operator):
 		if isinstance(o, SeededOperator): #could only possibly need parens if it was a SeededOperator
 			if o.unseeded_base.PRIORITY > cls.PRIORITY:
 				return '({})'.format(o)
-		return o
+		return str(o)
 
 	@classmethod
-	def format(cls, l, r):
-		l = cls._possibly_put_parens(l)
-		r = cls._possibly_put_parens(r)
-		return '{0}{1}{2}{1}{3}'.format(l, cls._space(), cls.NAME, r)
+	def format(cls, *args):
+		args = (cls._possibly_put_parens(a) for a in args)
+		return '{0}{1}{0}'.format(cls._space, cls.NAME).join(args)
+
+	@staticmethod
+	def _assert_values(l, r):
+		return hasattr(l, 'hasvalue') and hasattr(r, 'hasvalue') and \
+			   l.hasvalue() and r.hasvalue() and hasattr(l, 'value') and hasattr(r, 'value')
 
 class AddOperator(BinaryOperator):
 	PRIORITY = 3
@@ -51,28 +56,34 @@ class AddOperator(BinaryOperator):
 
 	@BinaryOperator.base_func.getter
 	def base_func(self):
-		def adder(l, r):
-			assert hasattr(l, 'hasvalue')
-			assert hasattr(r, 'hasvalue')
-			assert l.hasvalue() and r.hasvalue()
-			assert hasattr(l, 'value')
-			assert hasattr(r, 'value')
+		def capture(l, r):
+			assert self._assert_values(l, r)
 			return l.value + r.value
-		return adder
+		return capture
+
+
+class AddOperator(BinaryOperator):
+	PRIORITY = 3
+	NAME = '+'
+
+	@BinaryOperator.base_func.getter
+	def base_func(self):
+		def capture(l, r):
+			assert self._assert_values(l, r)
+			return l.value + r.value
+		return capture
+
+
 
 class MulOperator(BinaryOperator):
 	PRIORITY = 2
 	NAME = '*'
 	@BinaryOperator.base_func.getter
 	def base_func(self):
-		def adder(l, r):
-			assert hasattr(l, 'hasvalue')
-			assert hasattr(r, 'hasvalue')
-			assert l.hasvalue() and r.hasvalue()
-			assert hasattr(l, 'value')
-			assert hasattr(r, 'value')
+		def capture(l, r):
+			assert self._assert_values(l, r)
 			return l.value * r.value
-		return adder
+		return capture
 
 
 

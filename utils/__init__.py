@@ -6,3 +6,4 @@ from .from_stack import from_stack
 from .setdoc import setdoc
 from .scrub import scrub
 from .system_meta import SystemMeta
+from .class_property import classproperty
