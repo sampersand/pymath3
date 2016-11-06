@@ -19,7 +19,7 @@ class UserVariable(UserObj, Variable, is_pymath_userobj=True):
 	See UserObj for more information on User objects.
 	'''
 
-	def __init__(self, name = Variable._default_name, value = Variable._default_value):
+	def __init__(self, name = None, value = None):
 		''' Initializes self. 
 
 		This differs from Variable solely due to the fast that this can accept positional arguments,
@@ -27,26 +27,32 @@ class UserVariable(UserObj, Variable, is_pymath_userobj=True):
 
 		Arguments:
 			name  -- The name of this variable. Can be inferred
-			         (default: Variable._default_name)
+			         (default: UserVariable._DEFAULT_NAME)
 			value -- The value of this variable. Can't be inferred
-			         (default: Variable._default_value)
+			         (default: UserVariable._DEFAULT_VALUE)
 		Returns:
 			None
 		'''
-
 		super().__init__(name = name, value = value)
 
-	def __repr__(self):
-		if self.hasname() and self.hasvalue():
-			return '{}({!r}, {!r})'.format(type(self).__qualname__, self.name, self.value)
-		elif self.hasname():
-			assert not self.hasvalue()
-			return '{}({!r})'.format(type(self).__qualname__, self.name)
-		elif self.hasvalue():
-			assert not self.hasname()
-			return '{}(value={!r})'.format(type(self).__qualname__, self.value)
-		else:
-			assert not self.hasname() and not self.hasvalue()
-			return super().__repr__()
-
+	def _gen_repr(self, args, kwargs):
+		assert not args and not kwargs
+		# return super()
+		if self.hasname():
+			args = (self.name, )
+		if self.hasvalue():
+			if not args:
+				kwargs = {'value': self.value}
+			else:
+				args = (self.name, self.value)
+		return super()._gen_repr(args, kwargs)
 __slots__ = ('_value', '_name')
+
+
+
+
+
+
+
+
+

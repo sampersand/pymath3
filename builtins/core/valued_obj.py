@@ -10,10 +10,10 @@ class ValuedObj(Operable):
 	See Constant and Variable for builtin subclasses for this.
 	'''
 
-	_default_value = None
-	_allowed_value_types = (int, float, bool, complex, type(None))
+	_DEFAULT_VALUE = None
+	_ALLOWED_VALUE_TYPES = (int, float, bool, complex, type(None))
 
-	def __init__(self, *args, value = _default_value, **kwargs):
+	def __init__(self, *args, value = None, **kwargs):
 		''' Initializes self with 'value'
 		
 		This class is meant to be subclassed, and shouldn't be instanced directly. If attempted, a
@@ -28,11 +28,11 @@ class ValuedObj(Operable):
 		'''
 
 		__class__.checktype(self)
-		super().__init__(*args, **kwargs)
 
 		if value is None:
-			value = self._default_value
+			value = self._DEFAULT_VALUE
 		self.value = value
+		super().__init__(*args, **kwargs)
 
 
 	value = property(doc = "The resulting value of this class")
@@ -43,19 +43,19 @@ class ValuedObj(Operable):
 
 	@value.setter
 	def value(self, newvalue):
-		if not isinstance(newvalue, self._allowed_value_types):
+		if not isinstance(newvalue, self._ALLOWED_VALUE_TYPES):
 			logger.warning("Attempted to set value to unknown type '{}'. Allowed types: {}".format(
 				type(newvalue).__qualname__,
-				', '.join('%r' % x.__qualname__ for x in self._allowed_value_types)))
+				', '.join('%r' % x.__qualname__ for x in self._ALLOWED_VALUE_TYPES)))
 		self._value = newvalue
 
 	@value.deleter
 	def value(self):
-		self._value = self._default_value
+		self._value = self._DEFAULT_VALUE
 
 	def hasvalue(self):
 		''' Return true if this this class has a value. '''
-		return self.value != self._default_value
+		return self.value != self._DEFAULT_VALUE
 
 	def __str__(self):
 		''' Returns a string representation of this class.
@@ -72,11 +72,11 @@ class ValuedObj(Operable):
 
 		return super().__str__()
 
-	def __repr__(self):
+	def _gen_repr(self, args, kwargs):
+		assert 'value' not in kwargs, kwargs
 		if self.hasvalue():
-			return '{}(value={!r})'.format(type(self).__qualname__, self.value)
-		assert not self.hasvalue()
-		return super().__repr__()
+			kwargs['value'] = repr(self.value)
+		return super()._gen_repr(args, kwargs)
 
 __all__ = ('ValuedObj', )
 

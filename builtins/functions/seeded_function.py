@@ -1,9 +1,10 @@
 from . import ValuedObj, scrub, MathObj
 class SeededFunction(ValuedObj):
-	def __init__(self, unseeded_base, call_args, **kwargs):
+
+	def __init__(self, *, unseeded_base, call_args, **kwargs):
+		assert unseeded_base
 		self.unseeded_base = unseeded_base
 		self.call_args = tuple(map(scrub, call_args))
-		assert self.unseeded_base
 		assert all(isinstance(arg, MathObj) for arg in self)
 		super().__init__(**kwargs)
 
@@ -25,8 +26,9 @@ class SeededFunction(ValuedObj):
 			return str(self.value)
 		return '{}({})'.format(self.unseeded_base.name, *self)
 
-	def _gen_repr(self, *args, **kwargs):
-		return super()._gen_repr(*args,
-		    unseeded_base = self.unseeded_base,
-		    call_args = self.call_args,
-		    **kwargs)
+	def _gen_repr(self, args, kwargs):
+		assert 'unseeded_base' not in kwargs, kwargs
+		assert 'call_args' not in kwargs, kwargs
+		kwargs['unseeded_base'] = self.unseeded_base
+		kwargs['call_args'] = self.call_args
+		return super()._gen_repr(args, kwargs)

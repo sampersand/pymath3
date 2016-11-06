@@ -9,30 +9,29 @@ class Constant(ValuedObj):
 	robust.
 	'''
 	__slots__ = ('_value', )
-	_default_value = 0
+	_DEFAULT_VALUE = 0
 
 class UserConstant(UserObj, Constant, is_pymath_userobj=True):
 	''' The UserObj for Constant
 
 	See UserObj for more information on User objects.
 	'''
-	def __init__(self, value = Constant._default_value):
+	def __init__(self, value = Constant._DEFAULT_VALUE):
 		''' Initiates self.
 		
 		This function passes 'value' to Constant's constructor, and nothing else.
 
 		Arguments:
-			value -- The value of this class. (default: Constant._default_value)
+			value -- The value of this class. (default: Constant._DEFAULT_VALUE)
 		Returns:
 			None
 		'''
 		super().__init__(value = value)
 
 
-	def __repr__(self):
-		if self.hasvalue():
-			return '{}({!r})'.format(type(self).__qualname__, self.value)
-		return super().__repr__()
+	def _gen_repr(self, args, kwargs):
+		assert not args and not kwargs
+		return super()._gen_repr(self.value)
 
 	__slots__ = ('_value', )
 

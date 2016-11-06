@@ -19,23 +19,19 @@ class MathObj():
 		Returns:
 			None
 		'''
-
 		__class__.checktype(self)
 		super().__init__(*args, **kwargs)
 
 
 
-	def _gen_repr(self, *args, **kwargs):
-		ret = type(self).__qualname__ + '('
-		if args:
-			ret += repr(args)[1:-1]
+	def _gen_repr(self, args, kwargs):
 		return '{}({}{}{})'.format(tq(self), 
 		    ', '.join(repr(x) for x in args),
 			', ' if args and kwargs else '',
-			', '.join('{}={}'.format(key, value) for key, value in kwargs.items())
+			', '.join('{}={}'.format(key, repr(value)) for key, value in kwargs.items())
 			)
 	def __repr__(self):
-		return self._gen_repr()
+		return self._gen_repr((), {})
 
 	@classmethod
 	def checktype(cls, self):

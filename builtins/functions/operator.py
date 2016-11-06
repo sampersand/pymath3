@@ -1,7 +1,7 @@
 from .unseeded_function import UnseededFunction
 from .seeded_operator import SeededOperator
 class Operator(UnseededFunction):
-	seeded_type = SeededOperator
+	SEEDED_TYPE = SeededOperator
 
 	PRIORITY = None
 	NAME = None
@@ -17,7 +17,7 @@ class Operator(UnseededFunction):
 
 	@UnseededFunction.name.getter
 	def name(self):
-		assert self._name is self._default_name
+		assert self._name is self._DEFAULT_NAME
 		return type(self).NAME
 
 

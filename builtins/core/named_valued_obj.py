@@ -43,11 +43,15 @@ class NamedValuedObj(NamedObj, ValuedObj):
 		return super().__str__()
 
 
-	def __repr__(self):
-		if self.hasname() and self.hasvalue():
-			return '{}(name={!r}, value={!r})'.format(type(self).__qualname__, self.name, self.value)
-		assert not self.hasname() or not self.hasvalue()
-		return super().__repr__()
+
+
+
+
+
+
+
+
+
 
 
 

@@ -7,8 +7,8 @@ class NamedObj(MathObj):
 	warning will be logged.
 	'''
 
-	_default_name = None
-	_allowed_name_types = (str, bytes, type(None))
+	_DEFAULT_NAME = None
+	_ALLOWED_NAME_TYPES = (str, bytes, type(None))
 
 	def __init__(self, *args, name = None, **kwargs):
 		'''Initialize self.
@@ -25,10 +25,10 @@ class NamedObj(MathObj):
 		'''
 
 		__class__.checktype(self)
-		super().__init__(*args, **kwargs)
 		if name is None:
-			name = self._default_name
+			name = self._DEFAULT_NAME
 		self.name = name
+		super().__init__(*args, **kwargs)
 
 
 	name = property(doc = "The name of this class")
@@ -41,15 +41,15 @@ class NamedObj(MathObj):
 	def name(self, newname):
 		if hasattr(self, '_name'):
 			logger.info('Overriding name {} with {}'.format(self.name, newname))
-		if not isinstance(newname, self._allowed_name_types):
+		if not isinstance(newname, self._ALLOWED_NAME_TYPES):
 			logger.warning("Name is unknown type '{}'. Allowed types: {}".format(
 				type(newname).__qualname__,
-				', '.join('%r' % x.__qualname__ for x in self._allowed_name_types)))
+				', '.join('%r' % x.__qualname__ for x in self._ALLOWED_NAME_TYPES)))
 		self._name = newname
 
 	def hasname(self):
 		''' Return true if this this class has a name. '''
-		return self.name != self._default_name
+		return self.name != self._DEFAULT_NAME
 
 	def __str__(self):
 		''' Returns a string representation of this class.
@@ -66,11 +66,11 @@ class NamedObj(MathObj):
 		return super().__str__()
 
 
-	def __repr__(self):
+	def _gen_repr(self, args, kwargs):
+		assert 'name' not in kwargs, kwargs
 		if self.hasname():
-			return '{}(name={!r})'.format(type(self).__qualname__, self.name)
-		assert not self.hasname()
-		return super().__repr__()
+			kwargs['name'] = repr(self.name)
+		return super()._gen_repr(args, kwargs)
 __all__ = ('NamedObj', )
 
 
