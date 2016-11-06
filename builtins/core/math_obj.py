@@ -24,6 +24,8 @@ class MathObj():
 		super().__init__(*args, **kwargs)
 
 	def __repr__(self):
+		if type(self) != MathObj:
+			logger.warning("Class type {} doesn't implement it's own __repr__!".format(type(self).__qualname__))
 		return '{}()'.format(type(self).__qualname__)
 
 	@classmethod

@@ -17,6 +17,7 @@ class UserObj(MathObj):
 	def __init__(self, *args, **kwargs):
 		__class__.checktype(self)
 		super().__init__(*args, **kwargs)
+
 	@staticmethod
 	def __init_subclass__(*, is_pymath_userobj = False, **kwargs):
 		if not is_pymath_userobj:

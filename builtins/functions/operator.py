@@ -2,17 +2,24 @@ from .unseeded_function import UnseededFunction
 from .seeded_operator import SeededOperator
 class Operator(UnseededFunction):
 	seeded_type = SeededOperator
-	priority = None
+
+	PRIORITY = None
+	NAME = None
 
 	def __init__(self, **kwargs):
 		super().__init__(**kwargs)
-		assert hasattr(self, 'priority') and self.priority is not None
+		assert hasattr(type(self), 'PRIORITY') and type(self).PRIORITY is not None
 
 	def format(self, *args):
 		if self.arglen:
 			pass
-		print(self.arglen)
 		return ''
+
+	@UnseededFunction.name.getter
+	def name(self):
+		assert self._name is self._default_name
+		return type(self).NAME
+
 
 class BinaryOperator(Operator):
 	def __init__(self, **kwargs):
@@ -27,11 +34,10 @@ class BinaryOperator(Operator):
 		return '{0}{1}{2}{1}{3}'.format(l, self._space, self.name, r)
 
 class AddOperator(BinaryOperator):
-	priority = 1
-	name = '+'
+	PRIORITY = 3
+	NAME = '+'
 
-	base_func = Operator.base_func
-	@base_func.getter
+	@BinaryOperator.base_func.getter
 	def base_func(self):
 		def adder(l, r):
 			assert hasattr(l, 'hasvalue')
@@ -42,19 +48,30 @@ class AddOperator(BinaryOperator):
 			return l.value + r.value
 		return adder
 class MulOperator(BinaryOperator):
-	priority = 
+	PRIORITY = 2
+	NAME = '*'
+	@BinaryOperator.base_func.getter
+	def base_func(self):
+		def adder(l, r):
+			assert hasattr(l, 'hasvalue')
+			assert hasattr(r, 'hasvalue')
+			assert l.hasvalue() and r.hasvalue()
+			assert hasattr(l, 'value')
+			assert hasattr(r, 'value')
+			return l.value * r.value
+		return adder
 
 
 
-8: <, <=, >, >=, !=, ==
-7: |
-6: ^
-5: &
-4: <<, >>
-3: +, -
-2: *, @, /, //, %
-1: +x, -x, ~x
-0: **
+# 8: <, <=, >, >=, !=, ==
+# 7: |
+# 6: ^
+# 5: &
+# 4: <<, >>
+# 3: +, -
+# 2: *, @, /, //, %
+# 1: +x, -x, ~x
+# 0: **
 
 
 def gen_opers():
