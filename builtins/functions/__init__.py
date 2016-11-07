@@ -6,5 +6,6 @@ from pymath3.utils import scrub
 from pymath3.builtins.core.named_obj import NamedObj
 from pymath3.builtins.core.valued_obj import ValuedObj
 from pymath3.builtins.core.math_obj import MathObj
+from pymath3.builtins.core.constant import Constant
 from .operator import gen_opers
 operators = gen_opers()

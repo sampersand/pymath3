@@ -1,7 +1,6 @@
+class b():
+	pass
 class a():
-	__slots__ = 'a',
-class b(a):
-	__slots__ = 'b',
-B = b()
-B.a = 1
-print(B)
+	def __new__(self):
+		return a(1)
+print(type(a()))
