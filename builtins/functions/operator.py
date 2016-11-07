@@ -197,7 +197,13 @@ def gen_opers():
 	ret['__invert__'] = InvertOperator()
 
 	ret['__radd__'] = ROperator(oper = ret['__add__'])
+	ret['__rsub__'] = ROperator(oper = ret['__sub__'])
+	ret['__rmul__'] = ROperator(oper = ret['__mul__'])
 	ret['__rtruediv__'] = ROperator(oper = ret['__truediv__'])
+	ret['__rfloordiv__'] = ROperator(oper = ret['__floordiv__'])
+	ret['__rpow__'] = ROperator(oper = ret['__pow__'])
+	ret['__rmod__'] = ROperator(oper = ret['__mod__'])
+
 	return ret
 operators = gen_opers()
 
