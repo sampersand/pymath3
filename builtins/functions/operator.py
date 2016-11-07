@@ -148,11 +148,28 @@ class PowOperator(MultiOperator):
 
 class ROperator(Operator):
 	__slots__ = ('_oper', )
+
 	def __init__(self, *, oper):
 		self._oper = oper
 
 	def __getattr__(self, attr):
+		return self._oper._base_func
 		return getattr(self._oper, attr)
+
+	def format(self, *args):
+		return self._oper.format(*reversed(args))
+
+	@Operator.base_func.getter
+	def base_func(self):
+		def capture(l, r):
+			assert hasattr(l, 'hasvalue')
+			assert hasattr(r, 'hasvalue')
+			assert l.hasvalue()
+			assert r.hasvalue()
+			assert hasattr(l, 'value')
+			assert hasattr(r, 'value')
+			return type(self._oper).BASE_FUNC(r.value, l.value)
+		return capture
 
 # 8: <, <=, >, >=, !=, ==
 # 7: |
@@ -180,6 +197,7 @@ def gen_opers():
 	ret['__invert__'] = InvertOperator()
 
 	ret['__radd__'] = ROperator(oper = ret['__add__'])
+	ret['__rtruediv__'] = ROperator(oper = ret['__truediv__'])
 	return ret
 operators = gen_opers()
 
