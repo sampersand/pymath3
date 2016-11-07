@@ -2,7 +2,11 @@ from .unseeded_function import UnseededFunction
 from .seeded_operator import SeededOperator
 class Operator(UnseededFunction):
 	SEEDED_TYPE = SeededOperator
+
 	NAME = None
+	CLASSES_THAT_NEED_PARENS = ()
+	SPACES = ('', '')
+	BASE_FUNC = None
 
 	if __debug__:
 		def __init__(self, *args, **kwargs):
@@ -13,26 +17,21 @@ class Operator(UnseededFunction):
 		assert self._name is self._DEFAULT_NAME
 		return type(self).NAME
 
-	CLASSES_THAT_NEED_PARENS = ()
-	SPACES = ('', '')
 
-	@classmethod
-	def _needs_parens(cls, ocls):
-		assert issubclass(cls, Operator)
-		return any(issubclass(ocls, tocheckcls) for tocheckcls in cls.CLASSES_THAT_NEED_PARENS)
+	def _needs_parens(self, ocls):
+		assert isinstance(self, Operator)
+		return any(issubclass(ocls, tocheckcls) for tocheckcls in self.CLASSES_THAT_NEED_PARENS)
 
-	@classmethod
-	def _gen_format_args(cls, args):
+	def _gen_format_args(self, args):
 		for arg in args:
 			if isinstance(arg, SeededOperator) and not arg.hasvalue():
 				assert isinstance(arg.unseeded_base, Operator)
-				if cls._needs_parens(type(arg.unseeded_base)): #only thing that needs parens are SeededOperator
+				if self._needs_parens(type(arg.unseeded_base)): #only thing that needs parens are SeededOperator
 					yield '(' + str(arg) + ')'
 					continue
 			yield str(arg)
 
-	@classmethod
-	def format(cls, *args):
+	def format(self, *args):
 		raise NotImplementedError
 
 class MultiOperator(Operator):
@@ -54,12 +53,11 @@ class MultiOperator(Operator):
 		return capture
 
 
-	@classmethod
-	def format(cls, *args):
+	def format(self, *args):
 		'''
 		this entire func is used to make sure things have parens or not
 		'''
-		return '{}{}{}'.format(cls.SPACES[0], cls.NAME, cls.SPACES[1]).join(cls._gen_format_args(args))
+		return '{}{}{}'.format(self.SPACES[0], self.NAME, self.SPACES[1]).join(self._gen_format_args(args))
 
 class AddOperator(MultiOperator):
 	''' Operator representing the mathematical operation 'x + y'. '''
@@ -117,12 +115,11 @@ class UnaryOperator(Operator):
 			return type(self).BASE_FUNC(l.value)
 		return capture
 
-	@classmethod
-	def format(cls, *args):
+	def format(self, *args):
 		assert len(args) == 1
-		fargs = cls._gen_format_args(args)
+		fargs = self._gen_format_args(args)
 
-		return '{}{}{}{}'.format(cls.SPACES[0], cls.NAME, cls.SPACES[1], next(fargs))
+		return '{}{}{}{}'.format(self.SPACES[0], self.NAME, self.SPACES[1], next(fargs))
 
 class NegOperator(UnaryOperator):
 	''' Operator representing the mathematical operation '-x'. '''
@@ -149,6 +146,13 @@ class PowOperator(MultiOperator):
 	NAME = '**'
 	BASE_FUNC = lambda a, b: a ** b
 
+class ROperator(Operator):
+	__slots__ = ('_oper', )
+	def __init__(self, *, oper):
+		self._oper = oper
+
+	def __getattr__(self, attr):
+		return getattr(self._oper, attr)
 
 # 8: <, <=, >, >=, !=, ==
 # 7: |
@@ -174,6 +178,8 @@ def gen_opers():
 	ret['__neg__'] = NegOperator()
 	ret['__pos__'] = PosOperator()
 	ret['__invert__'] = InvertOperator()
+
+	ret['__radd__'] = ROperator(oper = ret['__add__'])
 	return ret
 operators = gen_opers()
 
