@@ -48,7 +48,9 @@ class Operable(MathObj):
 	def __rmod__(self, other): return self._do('__rmod__', other)
 
 
-
+	def __pos__(self): return self._do('__pos__')
+	def __neg__(self): return self._do('__neg__')
+	def __invert__(self): return self._do('__invert__')
 
 
 

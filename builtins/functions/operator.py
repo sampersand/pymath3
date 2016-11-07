@@ -8,40 +8,18 @@ class Operator(UnseededFunction):
 		def __init__(self, *args, **kwargs):
 			super().__init__(*args, **kwargs)
 
-	@classmethod
-	def format(cls, *args):
-		if self.arglen:
-			pass
-		return ''
-
 	@UnseededFunction.name.getter
 	def name(self):
 		assert self._name is self._DEFAULT_NAME
 		return type(self).NAME
 
-
-class UnaryOperator(Operator):
-	pass
-
-class BinaryOperator(Operator):
 	CLASSES_THAT_NEED_PARENS = ()
-	SPACE = ('', '')
-	def __init__(self, **kwargs):
-		super().__init__(**kwargs)
-		assert self.arglen == 2
+	SPACES = ('', '')
 
 	@classmethod
 	def _needs_parens(cls, ocls):
 		assert issubclass(cls, Operator)
 		return any(issubclass(ocls, tocheckcls) for tocheckcls in cls.CLASSES_THAT_NEED_PARENS)
-
-
-	@classmethod
-	def format(cls, *args):
-		'''
-		this entire func is used to make sure things have parens or not
-		'''
-		return '{}{}{}'.format(cls.SPACE[0], cls.NAME, cls.SPACE[1]).join(cls._gen_format_args(args))
 
 	@classmethod
 	def _gen_format_args(cls, args):
@@ -53,23 +31,40 @@ class BinaryOperator(Operator):
 					continue
 			yield str(arg)
 
-	@staticmethod
-	def _assert_values(l, r):
-		return hasattr(l, 'hasvalue') and hasattr(r, 'hasvalue') and \
-			   l.hasvalue() and r.hasvalue() and hasattr(l, 'value') and hasattr(r, 'value')
+	@classmethod
+	def format(cls, *args):
+		raise NotImplementedError
 
+class MultiOperator(Operator):
+
+	def __init__(self, **kwargs):
+		super().__init__(**kwargs)
+		assert self.arglen == 2
 
 	@Operator.base_func.getter
 	def base_func(self):
 		def capture(l, r):
-			assert self._assert_values(l, r)
+			assert hasattr(l, 'hasvalue')
+			assert hasattr(r, 'hasvalue')
+			assert l.hasvalue()
+			assert r.hasvalue()
+			assert hasattr(l, 'value')
+			assert hasattr(r, 'value')
 			return type(self).BASE_FUNC(l.value, r.value)
 		return capture
 
-class AddOperator(BinaryOperator):
+
+	@classmethod
+	def format(cls, *args):
+		'''
+		this entire func is used to make sure things have parens or not
+		'''
+		return '{}{}{}'.format(cls.SPACES[0], cls.NAME, cls.SPACES[1]).join(cls._gen_format_args(args))
+
+class AddOperator(MultiOperator):
 	''' Operator representing the mathematical operation 'x + y'. '''
 	CLASSES_THAT_NEED_PARENS = ()
-	SPACE = (' ', ' ')
+	SPACES = (' ', ' ')
 	NAME = '+'
 	BASE_FUNC = lambda a, b: a + b
 
@@ -79,7 +74,9 @@ class SubOperator(AddOperator):
 	NAME = '-'
 	BASE_FUNC = lambda a, b: a + b
 
-class MulOperator(BinaryOperator):
+
+
+class MulOperator(MultiOperator):
 	''' Operator representing the mathematical operation 'x * y'. '''
 	CLASSES_THAT_NEED_PARENS = (AddOperator, )
 	NAME = '*'
@@ -106,12 +103,52 @@ class ModOperator(MulOperator):
 	NAME = '%'
 	BASE_FUNC = lambda a, b: a % b
 
-class PowOperator(BinaryOperator):
+
+class UnaryOperator(Operator):
+	CLASSES_THAT_NEED_PARENS = (AddOperator, MulOperator)
+	SPACES = ('', '')
+
+	@Operator.base_func.getter
+	def base_func(self):
+		def capture(l):
+			assert hasattr(l, 'hasvalue')
+			assert l.hasvalue()
+			assert hasattr(l, 'value')
+			return type(self).BASE_FUNC(l.value)
+		return capture
+
+	@classmethod
+	def format(cls, *args):
+		assert len(args) == 1
+		fargs = cls._gen_format_args(args)
+
+		return '{}{}{}{}'.format(cls.SPACES[0], cls.NAME, cls.SPACES[1], next(fargs))
+
+class NegOperator(UnaryOperator):
+	''' Operator representing the mathematical operation '-x'. '''
+	NAME = '-'
+	BASE_FUNC = lambda a: -a
+
+
+class PosOperator(UnaryOperator):
+	''' Operator representing the mathematical operation '+x'. '''
+	NAME = '+'
+	BASE_FUNC = lambda a: +a
+
+
+class InvertOperator(UnaryOperator):
+	''' Operator representing the mathematical operation '~x'. '''
+	NAME = '~'
+	BASE_FUNC = lambda a: ~a
+
+
+class PowOperator(MultiOperator):
 	''' Operator representing the mathematical operation 'x ** y'. '''
 	CLASSES_THAT_NEED_PARENS = (AddOperator, MulOperator, UnaryOperator)
-	SPACE = (' ', ' ')
+	SPACES = (' ', ' ')
 	NAME = '**'
 	BASE_FUNC = lambda a, b: a ** b
+
 
 # 8: <, <=, >, >=, !=, ==
 # 7: |
@@ -133,6 +170,10 @@ def gen_opers():
 	ret['__floordiv__'] = FloorDivOperator()
 	ret['__pow__'] = PowOperator()
 	ret['__mod__'] = ModOperator()
+
+	ret['__neg__'] = NegOperator()
+	ret['__pos__'] = PosOperator()
+	ret['__invert__'] = InvertOperator()
 	return ret
 operators = gen_opers()
 
