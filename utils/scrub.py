@@ -8,8 +8,8 @@ def scrub(arg, *, imports = _importdict(), **kwargs): # this is _not_ exhaustive
 	MathObj = imports.get('MathObj', 'pymath3.builtins.core.math_obj', 'MathObj')
 	if isinstance(arg, MathObj):
 		return arg
-	var = imports.get('var', 'pymath3.builtins.core.variable', 'UserVariable')
-	if isinstance(arg, var._ALLOWED_VALUE_TYPES):
-		return var(value = arg, **kwargs)
+	Constant = imports.get('Constant', 'pymath3.builtins.core.constant', 'Constant')
+	if isinstance(arg, Constant._ALLOWED_VALUE_TYPES):
+		return Constant(value = arg, **kwargs)
 
 	raise TypeError(type(arg))

@@ -83,7 +83,7 @@ class AddOperator(MultiOperator):
 	CLASSES_THAT_NEED_PARENS = ()
 	SPACES = (' ', ' ')
 	NAME = '+'
-	BASE_FUNC = lambda a, b: a + b
+	BASE_FUNC = staticmethod(lambda a, b: a + b)
 
 	@staticmethod
 	def _weed_out(args):
@@ -94,7 +94,7 @@ class SubOperator(MultiOperator):
 	CLASSES_THAT_NEED_PARENS = AddOperator.CLASSES_THAT_NEED_PARENS
 	SPACES = AddOperator.SPACES
 	NAME = '-'
-	BASE_FUNC = lambda a, b: a + b
+	BASE_FUNC = staticmethod(lambda a, b: a + b)
 
 
 
@@ -102,7 +102,7 @@ class MulOperator(MultiOperator):
 	''' Operator representing the mathematical operation 'x * y'. '''
 	CLASSES_THAT_NEED_PARENS = (AddOperator, )
 	NAME = '*'
-	BASE_FUNC = lambda a, b: a * b
+	BASE_FUNC = staticmethod(lambda a, b: a * b)
 
 	@staticmethod
 	def _weed_out(args):
@@ -116,13 +116,13 @@ class MMulOperator(MultiOperator):
 	
 	CLASSES_THAT_NEED_PARENS = MulOperator.CLASSES_THAT_NEED_PARENS
 	NAME = '@'
-	BASE_FUNC = lambda a, b: a @ b
+	BASE_FUNC = staticmethod(lambda a, b: a @ b)
 
 class TrueDivOperator(MultiOperator):
 	''' Operator representing the mathematical operation 'x / y'. '''
 	CLASSES_THAT_NEED_PARENS = MulOperator.CLASSES_THAT_NEED_PARENS
 	NAME = '/'
-	BASE_FUNC = lambda a, b: a / b
+	BASE_FUNC = staticmethod(lambda a, b: a / b)
 
 	def _sort_args(self, args):
 		return args
@@ -137,7 +137,7 @@ class FloorDivOperator(MultiOperator):
 	''' Operator representing the mathematical operation 'x // y'. '''
 	CLASSES_THAT_NEED_PARENS = MulOperator.CLASSES_THAT_NEED_PARENS
 	NAME = '//'
-	BASE_FUNC = lambda a, b: a // b
+	BASE_FUNC = staticmethod(lambda a, b: a // b)
 
 	_sort_args = TrueDivOperator._sort_args
 	_weed_out = TrueDivOperator._weed_out
@@ -147,7 +147,7 @@ class ModOperator(MultiOperator):
 
 	CLASSES_THAT_NEED_PARENS = MulOperator.CLASSES_THAT_NEED_PARENS
 	NAME = '%'
-	BASE_FUNC = lambda a, b: a % b
+	BASE_FUNC = staticmethod(lambda a, b: a % b)
 
 
 
@@ -173,19 +173,19 @@ class UnaryOperator(Operator):
 class NegOperator(UnaryOperator):
 	''' Operator representing the mathematical operation '-x'. '''
 	NAME = '-'
-	BASE_FUNC = lambda a: -a
+	BASE_FUNC = staticmethod(lambda a: -a)
 
 
 class PosOperator(UnaryOperator):
 	''' Operator representing the mathematical operation '+x'. '''
 	NAME = '+'
-	BASE_FUNC = lambda a: +a
+	BASE_FUNC = staticmethod(lambda a: +a)
 
 
 class InvertOperator(UnaryOperator):
 	''' Operator representing the mathematical operation '~x'. '''
 	NAME = '~'
-	BASE_FUNC = lambda a: ~a
+	BASE_FUNC = staticmethod(lambda a: ~a)
 
 
 class PowOperator(MultiOperator):
@@ -193,7 +193,7 @@ class PowOperator(MultiOperator):
 	CLASSES_THAT_NEED_PARENS = (AddOperator, MulOperator, UnaryOperator)
 	SPACES = (' ', ' ')
 	NAME = '**'
-	BASE_FUNC = lambda a, b: a ** b
+	BASE_FUNC = staticmethod(lambda a, b: a ** b)
 	_START_END = -1
 	def _sort_args(self, args):
 		return args
@@ -202,7 +202,7 @@ class PowOperator(MultiOperator):
 		pos = 1
 		while pos < len(args) and args[pos].hasvalue():
 			pos += 1
-		if pos > 1:
+		if pos > 2:
 			return [args[0]] + [self(*args[1:pos])] + list(args[pos:])
 		return args
 
