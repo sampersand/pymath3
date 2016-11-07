@@ -41,12 +41,12 @@ class Operable(MathObj):
 	def __mod__(self, other): return self._do('__mod__', other)
 
 	def __radd__(self, other): return scrub(other)._do('__add__', self)
-	def __rsub__(self, other): return self._do('__rsub__', other)
-	def __rmul__(self, other): return self._do('__rmul__', other)
-	def __rtruediv__(self, other): return self._do('__rtruediv__', other)
-	def __rfloordiv__(self, other): return self._do('__rfloordiv__', other)
-	def __rpow__(self, other): return self._do('__rpow__', other)
-	def __rmod__(self, other): return self._do('__rmod__', other)
+	def __rsub__(self, other): return scrub(other)._do('__sub__', self)
+	def __rmul__(self, other): return scrub(other)._do('__mul__', self)
+	def __rtruediv__(self, other): return scrub(other)._do('__truediv__', self)
+	def __rfloordiv__(self, other): return scrub(other)._do('__floordiv__', self)
+	def __rpow__(self, other): return scrub(other)._do('__pow__', self)
+	def __rmod__(self, other): return scrub(other)._do('__mod__', self)
 
 
 	def __pos__(self): return self._do('__pos__')
