@@ -1,13 +1,5 @@
 from . import ValuedObj, scrub, MathObj
 class SeededFunction(ValuedObj):
-	def __new__(cls, *, unseeded_base, call_args, **kwargs):
-		if call_args:
-			if isinstance(call_args[0], SeededFunction):
-				if call_args[0].unseeded_base is unseeded_base:
-					call_args = call_args[0].call_args + call_args[1:]
-					return cls(unseeded_base = unseeded_base, call_args = call_args, **kwargs)
-		return super().__new__(cls)
-
 	def __init__(self, *, unseeded_base, call_args, **kwargs):
 		assert unseeded_base
 		self.unseeded_base = unseeded_base

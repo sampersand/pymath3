@@ -57,7 +57,6 @@ class MultiOperator(Operator):
 		'''
 		this entire func is used to make sure things have parens or not
 		'''
-		print(args)
 		return '{}{}{}'.format(self.SPACES[0], self.NAME, self.SPACES[1]).join(self._gen_format_args(args))
 
 class AddOperator(MultiOperator):
