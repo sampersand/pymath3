@@ -3,7 +3,7 @@ class _system_locals(dict):
 	BUILTIN_OBJNAMES = {'__module__', '__qualname__'}
 	def __setitem__(self, name, value):
 		if name not in self and name not in self.BUILTIN_OBJNAMES:
-			value = scrub(value, name = name)
+			value = scrub(value, name = name, prefer_var = True)
 
 		super().__setitem__(name, value)
 class SystemMeta(type):

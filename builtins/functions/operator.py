@@ -1,3 +1,5 @@
+from functools import reduce
+
 from . import Constant
 from .unseeded_function import UnseededFunction
 from .seeded_operator import SeededOperator
@@ -83,7 +85,7 @@ class AddOperator(MultiOperator):
 	CLASSES_THAT_NEED_PARENS = ()
 	SPACES = (' ', ' ')
 	NAME = '+'
-	BASE_FUNC = staticmethod(lambda a, b: a + b)
+	BASE_FUNC = staticmethod(lambda *args: reduce(lambda a, b: a + b, args))
 
 	@staticmethod
 	def _weed_out(args):
@@ -94,7 +96,7 @@ class SubOperator(MultiOperator):
 	CLASSES_THAT_NEED_PARENS = AddOperator.CLASSES_THAT_NEED_PARENS
 	SPACES = AddOperator.SPACES
 	NAME = '-'
-	BASE_FUNC = staticmethod(lambda a, b: a + b)
+	BASE_FUNC = staticmethod(lambda *args: reduce(lambda a, b: a + b, args))
 
 
 
@@ -102,11 +104,11 @@ class MulOperator(MultiOperator):
 	''' Operator representing the mathematical operation 'x * y'. '''
 	CLASSES_THAT_NEED_PARENS = (AddOperator, )
 	NAME = '*'
-	BASE_FUNC = staticmethod(lambda a, b: a * b)
+	BASE_FUNC = staticmethod(lambda *args: reduce(lambda a, b: a * b, args))
 
 	@staticmethod
 	def _weed_out(args):
-		assert len(args) < 2 or (args[0].hasvalue() and not args[1].hasvalue()), args #shoulda been done in _condense
+		assert len(args) < 2 or (not args[0].hasvalue() or not args[1].hasvalue()), args #shoulda been done in _condense
 		if args[0].value == 0:
 			return (Constant(value = 0), )
 		return (x for x in args if not x.hasvalue() or x.value != 1)
@@ -116,13 +118,13 @@ class MMulOperator(MultiOperator):
 	
 	CLASSES_THAT_NEED_PARENS = MulOperator.CLASSES_THAT_NEED_PARENS
 	NAME = '@'
-	BASE_FUNC = staticmethod(lambda a, b: a @ b)
+	BASE_FUNC = staticmethod(lambda *args: reduce(lambda a, b: a @ b, args))
 
 class TrueDivOperator(MultiOperator):
 	''' Operator representing the mathematical operation 'x / y'. '''
 	CLASSES_THAT_NEED_PARENS = MulOperator.CLASSES_THAT_NEED_PARENS
 	NAME = '/'
-	BASE_FUNC = staticmethod(lambda a, b: a / b)
+	BASE_FUNC = staticmethod(lambda *args: reduce(lambda a, b: a / b, args))
 
 	def _sort_args(self, args):
 		return args
@@ -137,7 +139,7 @@ class FloorDivOperator(MultiOperator):
 	''' Operator representing the mathematical operation 'x // y'. '''
 	CLASSES_THAT_NEED_PARENS = MulOperator.CLASSES_THAT_NEED_PARENS
 	NAME = '//'
-	BASE_FUNC = staticmethod(lambda a, b: a // b)
+	BASE_FUNC = staticmethod(lambda *args: reduce(lambda a, b: a // b, args))
 
 	_sort_args = TrueDivOperator._sort_args
 	_weed_out = TrueDivOperator._weed_out
@@ -147,7 +149,7 @@ class ModOperator(MultiOperator):
 
 	CLASSES_THAT_NEED_PARENS = MulOperator.CLASSES_THAT_NEED_PARENS
 	NAME = '%'
-	BASE_FUNC = staticmethod(lambda a, b: a % b)
+	BASE_FUNC = staticmethod(lambda *args: reduce(lambda a, b: a % b, args))
 
 
 
@@ -193,18 +195,22 @@ class PowOperator(MultiOperator):
 	CLASSES_THAT_NEED_PARENS = (AddOperator, MulOperator, UnaryOperator)
 	SPACES = (' ', ' ')
 	NAME = '**'
-	BASE_FUNC = staticmethod(lambda a, b: a ** b)
+	BASE_FUNC = staticmethod(lambda *args: reduce(lambda a, b: a ** b, args))
 	_START_END = -1
 	def _sort_args(self, args):
 		return args
 
 	def _condense(self, args):
-		pos = 1
-		while pos < len(args) and args[pos].hasvalue():
-			pos += 1
-		if pos > 2:
-			return [args[0]] + [self(*args[1:pos])] + list(args[pos:])
+		if len(args) < 2:
+			return args
 		return args
+		# if not args[0].hasvalue():
+		# 	pos = 1	
+		# 	while pos < len(args) and args[pos].hasvalue():
+		# 		pos += 1
+		# 	if pos > 2:
+		# 		return [args[0]] + [self(*args[1:pos])] + list(args[pos:])
+		# 	return args
 
 
 	@staticmethod
