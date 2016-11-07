@@ -1,4 +1,4 @@
-from importlib import import_module
+from . import import_module
 MathObj, Variable, Constant = None, None, None
 def scrub(arg, *, prefer_var = False, **kwargs): # this is _not_ exhaustive
 	global MathObj
@@ -12,7 +12,7 @@ def scrub(arg, *, prefer_var = False, **kwargs): # this is _not_ exhaustive
 			return Constant(value = arg, **kwargs)
 	else:
 		assert prefer_var
-		global Variable
+		global Variable 
 		Variable = Variable or import_module('pymath3.builtins.core.variable').Variable
 		if isinstance(arg, Variable._ALLOWED_VALUE_TYPES):
 			return Variable(value = arg, **kwargs)

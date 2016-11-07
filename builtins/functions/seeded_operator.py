@@ -1,4 +1,4 @@
-import importlib
+from . import import_module
 from .seeded_function import SeededFunction
 MultiOperator = None
 class SeededOperator(SeededFunction):
@@ -13,7 +13,7 @@ class SeededOperator(SeededFunction):
 			if isinstance(self.call_args[START], SeededFunction) and self.call_args[START].unseeded_base is self.unseeded_base:
 				global MultiOperator
 				if not MultiOperator:
-					MultiOperator = importlib.import_module('.operator', __package__).MultiOperator
+					MultiOperator = import_module('.operator', __package__).MultiOperator
 				if isinstance(self.call_args[START].unseeded_base, MultiOperator):
 					if START == 0:
 						self.call_args = self.call_args[START].call_args + self.call_args[1:]

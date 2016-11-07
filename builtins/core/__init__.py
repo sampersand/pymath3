@@ -2,7 +2,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 from pymath3 import tq
-from pymath3.utils import scrub
+from pymath3.utils import scrub, import_module
 
 from .constant import UserConstant; const = UserConstant
 from .variable import UserVariable; var = UserVariable

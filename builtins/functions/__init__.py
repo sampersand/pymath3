@@ -1,7 +1,7 @@
 import logging
 logger = logging.getLogger(__name__)
 
-from pymath3.utils import scrub
+from pymath3.utils import scrub, import_module
 
 from pymath3.builtins.core.named_obj import NamedObj
 from pymath3.builtins.core.valued_obj import ValuedObj
