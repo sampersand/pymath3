@@ -9,7 +9,7 @@ def scrub(arg, *, imports = _importdict(), **kwargs): # this is _not_ exhaustive
 	if isinstance(arg, MathObj):
 		return arg
 	var = imports.get('var', 'pymath3.builtins.core.variable', 'UserVariable')
-	if isinstance(arg, var._allowed_value_types):
+	if isinstance(arg, var._ALLOWED_VALUE_TYPES):
 		return var(value = arg, **kwargs)
 
 	raise TypeError(type(arg))

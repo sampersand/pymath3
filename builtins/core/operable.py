@@ -31,10 +31,27 @@ class Operable(MathObj):
 			operators = importlib.import_module('pymath3.builtins.functions.operator').operators
 		return operators[func](self, *args)
 
-	def __add__(self, other):
-		return self._do('__add__', other)
-	def __mul__(self, other):
-		return self._do('__mul__', other)
+	def __add__(self, other): return self._do('__add__', other)
+	def __sub__(self, other): return self._do('__sub__', other)
+	def __mul__(self, other): return self._do('__mul__', other)
+	def __truediv__(self, other): return self._do('__truediv__', other)
+	def __floordiv__(self, other): return self._do('__floordiv__', other)
+	def __pow__(self, other): return self._do('__pow__', other)
+	def __mod__(self, other): return self._do('__mod__', other)
+
+	def __radd__(self, other): return self._do('__radd__', other)
+	def __rsub__(self, other): return self._do('__rsub__', other)
+	def __rmul__(self, other): return self._do('__rmul__', other)
+	def __rtruediv__(self, other): return self._do('__rtruediv__', other)
+	def __rfloordiv__(self, other): return self._do('__rfloordiv__', other)
+	def __rpow__(self, other): return self._do('__rpow__', other)
+	def __rmod__(self, other): return self._do('__rmod__', other)
+
+
+
+
+
+
 
 
 

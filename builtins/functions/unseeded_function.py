@@ -58,7 +58,7 @@ class UnseededFunction(NamedObj):
 			kwargs['body_str'] = self.body_str
 		return super()._gen_repr(args, kwargs)
 
-
+	__slots__ = ('body_str', 'args_str', '_name')
 
 
 
