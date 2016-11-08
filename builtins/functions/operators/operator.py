@@ -1,7 +1,5 @@
 from . import logger
-from .unseeded_function import UnseededFunction
-from .seeded_operator import SeededOperator
-from .seeded_function import SeededFunction
+from . import UnseededFunction, SeededOperator, SeededFunction
 
 class Operator(UnseededFunction):
 	SEEDED_TYPE = SeededOperator

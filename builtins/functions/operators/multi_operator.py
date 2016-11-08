@@ -1,3 +1,4 @@
+from . import Operator
 class MultiOperator(Operator):
 
 	def __init__(self, **kwargs):

@@ -1,3 +1,4 @@
+from . import CommutativeOperator
 class AddOperator(CommutativeOperator): # 'x + y'.
 	SPACES = (' ', ' ')
 	NAME = '+'

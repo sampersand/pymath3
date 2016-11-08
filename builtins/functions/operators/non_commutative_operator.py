@@ -1,3 +1,4 @@
+from . import MultiOperator
 class NonCommutativeOperator(MultiOperator):
 	pass
 	# @classmethod

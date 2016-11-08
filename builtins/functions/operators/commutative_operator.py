@@ -1,3 +1,4 @@
+from . import MultiOperator
 class CommutativeOperator(MultiOperator):
 	_sort_args = staticmethod(lambda args: sorted(args, key = lambda a: not a.hasvalue()))
 

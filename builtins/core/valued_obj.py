@@ -1,8 +1,7 @@
-from . import logger
+from . import logger, Derivable
 from .operable import Operable
 from copy import deepcopy
-
-class ValuedObj(Operable):
+class ValuedObj(Operable, Derivable):
 	''' Represents an object that can have a value.
 
 	This class is meant to be subclassed, and shouldn't be instanced directly. If attempted, a
@@ -84,7 +83,32 @@ class ValuedObj(Operable):
 			kwargs['value'] = repr(self.value)
 		return (args, kwargs)
 
+
+	def isconst(self, du):
+		if du.hasvalue():
+			logger.warning("du ({}) has a value!".format(du))
+		assert not du.hasvalue()
+		if __debug__:
+			from .variable import Variable
+			assert isinstance(du, Variable)
+		if self is du:
+			return False
+		if self.hasvalue():
+			return True
+		return False
 __all__ = ('ValuedObj', )
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

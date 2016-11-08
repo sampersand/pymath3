@@ -1,3 +1,5 @@
+from . import NonCommutativeOperator, AddOperator
+from . import SeededOperator
 class SubOperator(NonCommutativeOperator): # 'x - y'.
 	SPACES = AddOperator.SPACES
 	NAME = '-'

@@ -1,10 +1,10 @@
-from . import import_module, Derivable
+from . import import_module
 from .seeded_function import SeededFunction
-class SeededOperator(Derivable, SeededFunction):
+class SeededOperator(SeededFunction):
 	def __init__(self, **kwargs):
 		super().__init__(**kwargs)
 		if __debug__:
-			from .operator import Operator
+			from .operators import Operator
 			assert isinstance(self.unseeded_base, Operator)
 
 		if self.call_args:

@@ -28,7 +28,7 @@ class Operable(MathObj):
 	def _do(self, func, *args):
 		global operators
 		if not operators:
-			operators = import_module('pymath3.builtins.functions.operator').operators
+			operators = import_module('pymath3.builtins.functions.operators').operators
 		return operators[func](self, *args)
 
 	def __add__(self, other): return self._do('__add__', other)

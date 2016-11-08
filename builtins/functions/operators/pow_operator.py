@@ -1,5 +1,5 @@
+from . import MultiOperator
 class PowOperator(MultiOperator): # 'x ** y'.
-	SPACES = (' ', ' ')
 	NAME = '**'
 	BASE_FUNC = staticmethod(lambda *args: reduce(lambda a, b: a ** b, args))
 

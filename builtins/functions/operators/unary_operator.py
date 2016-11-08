@@ -1,3 +1,4 @@
+from . import Operator
 class UnaryOperator(Operator):
 	SPACES = ('', '')
 

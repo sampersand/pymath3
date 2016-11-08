@@ -46,6 +46,10 @@ class UserVariable(UserObj, Variable, is_pymath_userobj=True):
 			else:
 				args = (self.name, self.value)
 		return (args, kwargs)
+
+	def isconst(self, du):
+		assert isinstance(du, Variable)
+		return super().isconst(du) or self.hasname()
 __slots__ = ('_value', '_name')
 
 
