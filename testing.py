@@ -1,3 +1,4 @@
+from itertools import permutations, chain
 from importlib import import_module
 def _setattr(attr, val):
 	def capture(e):
@@ -45,6 +46,9 @@ def _get_multi_operators(pymath3):
 	for oper in import_module('pymath3.builtins.functions.operator').operators.values():
 		if isinstance(oper, MultiOperator):
 			yield oper
+def _test_opers(vars, consts, multi_opers, checkmap, amount):
+	opers = chain.from_iterable(permutations(multi_opers, n) for n in range(amount))
+	
 def test(pymath3):
 	var = pymath3.var
 	const = pymath3.const
@@ -56,7 +60,7 @@ def test(pymath3):
 	_test_normal_strs(vars, consts, checkmap)
 	_test_change_value_strs(vars, consts, checkmap)
 	multi_operators = tuple(_get_multi_operators(pymath3))
-	
+	_test_opers(vars, consts, multi_operators, checkmap, amount = 10)
 	print('done')
 
 

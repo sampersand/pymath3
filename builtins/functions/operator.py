@@ -7,7 +7,7 @@ from .seeded_function import SeededFunction
 class Operator(UnseededFunction):
 	SEEDED_TYPE = SeededOperator
 	NAME, BASE_FUNC = None, None
-
+	SPACES = ('', '')
 	if __debug__:
 		def __init__(self, *args, **kwargs):
 			super().__init__(*args, **kwargs)
@@ -30,7 +30,7 @@ class Operator(UnseededFunction):
 				else:
 					assert START == -1, 'only other defined one atm'
 					call_args = call_args[:-1] + call_args[START].call_args
-
+		soper.call_args = call_args
 
 	#str functions
 
@@ -89,14 +89,22 @@ class Operator(UnseededFunction):
 		Into
 			x - y - z
 		'''
-		return self.NAME.join(str(arg) for arg in args)
+
+		joiner = '{0}{2}{1}'.format(*self.SPACES, self.NAME)
+		return joiner.join(self._format_get_parens(args))
+
+	def _format_get_parens(self, args):
+		for arg in args:
+			if self._needs_parens(arg):
+				yield '(%s)' % arg
+			else:
+				yield str(arg)
 
 
-
-
-	def _needs_parens(self, ocls):
-		assert isinstance(self, Operator)
-		return any(issubclass(ocls, tocheckcls) for tocheckcls in self.CLASSES_THAT_NEED_PARENS)
+	def _needs_parens(self, other):
+		if not isinstance(other, SeededOperator):
+			return False
+		return type(other.unseeded_base) in self.paren_classes
 
 	def _gen_format_args(self, args):
 		for arg in args:
@@ -139,10 +147,13 @@ class CommutativeOperator(MultiOperator):
 	# 	if pos > 1:
 	# 		return [self(*args[0:pos])] + list(args[pos:])
 	# 	return args
-
+class NonCommutativeOperator(MultiOperator):
+	pass
+	# @classmethod
+	# def __init_subclass__(cls, *args):
+	# 	cls.paren_classes |= {cls}
 
 class AddOperator(CommutativeOperator): # 'x + y'.
-	CLASSES_THAT_NEED_PARENS = ()
 	SPACES = (' ', ' ')
 	NAME = '+'
 	BASE_FUNC = staticmethod(lambda *args: reduce(lambda a, b: a + b, args))
@@ -151,14 +162,23 @@ class AddOperator(CommutativeOperator): # 'x + y'.
 	# def _weed_out(args):
 	# 	return (x for x in args if not x.hasvalue() or x.value != 0)
 
-class SubOperator(MultiOperator): # 'x - y'.
-	CLASSES_THAT_NEED_PARENS = (AddOperator,)
+class SubOperator(NonCommutativeOperator): # 'x - y'.
 	SPACES = AddOperator.SPACES
 	NAME = '-'
-	BASE_FUNC = staticmethod(lambda *args: reduce(lambda a, b: a + b, args))
+	BASE_FUNC = staticmethod(lambda *args: reduce(lambda a, b: a - b, args))
+
+	def _format_get_parens(self, args):
+		assert args
+		if isinstance(args[0], SeededOperator) and isinstance(args[0].unseeded_base, AddOperator):
+			yield str(args[0])
+			args = args[1:]
+		for arg in args:
+			if self._needs_parens(arg):
+				yield '(%s)' % arg
+			else:
+				yield str(arg)
 
 class MulOperator(CommutativeOperator): # 'x * y'.
-	CLASSES_THAT_NEED_PARENS = (AddOperator, )
 	NAME = '*'
 	BASE_FUNC = staticmethod(lambda *args: reduce(lambda a, b: a * b, args))
 
@@ -171,13 +191,15 @@ class MulOperator(CommutativeOperator): # 'x * y'.
 
 class MMulOperator(MultiOperator): # 'x @ y'.
 
-	CLASSES_THAT_NEED_PARENS = MulOperator.CLASSES_THAT_NEED_PARENS
 	NAME = '@'
 	BASE_FUNC = staticmethod(lambda *args: reduce(lambda a, b: a @ b, args))
 
 
-class TrueDivOperator(MultiOperator): # 'x / y'.
-	CLASSES_THAT_NEED_PARENS = MulOperator.CLASSES_THAT_NEED_PARENS
+class ModOperator(CommutativeOperator): # 'x % y'.
+	NAME = '%'
+	BASE_FUNC = staticmethod(lambda *args: reduce(lambda a, b: a % b, args))
+
+class TrueDivOperator(NonCommutativeOperator): # 'x / y'.
 	NAME = '/'
 	BASE_FUNC = staticmethod(lambda *args: reduce(lambda a, b: a / b, args))
 
@@ -187,23 +209,14 @@ class TrueDivOperator(MultiOperator): # 'x / y'.
 		return [args[0]] + [x for x in args[1:] if not x.hasvalue() or x.value != 1]
 
 
-class FloorDivOperator(MultiOperator): # 'x // y'.
-	CLASSES_THAT_NEED_PARENS = MulOperator.CLASSES_THAT_NEED_PARENS
+class FloorDivOperator(NonCommutativeOperator): # 'x // y'.
 	NAME = '//'
 	BASE_FUNC = staticmethod(lambda *args: reduce(lambda a, b: a // b, args))
 
 	_weed_out = TrueDivOperator._weed_out
 
-class ModOperator(MultiOperator): # 'x % y'.
-
-	CLASSES_THAT_NEED_PARENS = MulOperator.CLASSES_THAT_NEED_PARENS
-	NAME = '%'
-	BASE_FUNC = staticmethod(lambda *args: reduce(lambda a, b: a % b, args))
-
-
 
 class UnaryOperator(Operator):
-	CLASSES_THAT_NEED_PARENS = (AddOperator, MulOperator)
 	SPACES = ('', '')
 
 	@Operator.base_func.getter
@@ -239,7 +252,6 @@ class InvertOperator(UnaryOperator): # '~x'.
 
 
 class PowOperator(MultiOperator): # 'x ** y'.
-	CLASSES_THAT_NEED_PARENS = (AddOperator, MulOperator, UnaryOperator)
 	SPACES = (' ', ' ')
 	NAME = '**'
 	BASE_FUNC = staticmethod(lambda *args: reduce(lambda a, b: a ** b, args))
@@ -289,6 +301,31 @@ class ROperator(Operator):
 			return type(self._oper).BASE_FUNC(r.value, l.value)
 		return capture
 
+
+def setparens():
+	add = AddOperator
+	sub = SubOperator
+	mul = MulOperator
+	mmul = MMulOperator
+	mod = ModOperator
+	truediv = TrueDivOperator
+	floordiv = FloorDivOperator
+	unary = UnaryOperator
+	neg = NegOperator
+	pos = PosOperator
+	invert = InvertOperator
+	pow = PowOperator
+
+	add.paren_classes = set()
+	sub.paren_classes = {add, sub}
+	mul.paren_classes = {mmul, mod} | sub.paren_classes
+	mmul.paren_classes = {mul, mod} | sub.paren_classes #idk about this
+	mod.paren_classes = {mul, mmul} | sub.paren_classes
+	truediv.paren_classes = {mod, mmul, mul, truediv, floordiv} | sub.paren_classes
+	floordiv.paren_classes = truediv.paren_classes
+	unary.paren_classes = truediv.paren_classes | {unary}
+	pow.paren_classes = unary.paren_classes | {pow}
+setparens()
 # 8: <, <=, >, >=, !=, ==
 # 7: |
 # 6: ^
