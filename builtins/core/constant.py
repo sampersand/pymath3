@@ -12,6 +12,8 @@ class Constant(ValuedObj):
 	_DEFAULT_VALUE = 0
 	def __str__(self):
 		return str(self.value)
+
+	
 class UserConstant(UserObj, Constant, is_pymath_userobj=True):
 	''' The UserObj for Constant
 
