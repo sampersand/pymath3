@@ -36,7 +36,7 @@ class UserConstant(UserObj, Constant, is_pymath_userobj=True):
 		assert not args and not kwargs
 		if self.hasvalue():
 			args = (self.value, )
-		return super()._gen_repr(args, kwargs)
+		return args, kwargs
 
 	__slots__ = ('_value', )
 

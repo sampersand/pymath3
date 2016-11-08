@@ -45,7 +45,7 @@ class UserVariable(UserObj, Variable, is_pymath_userobj=True):
 				kwargs = {'value': self.value}
 			else:
 				args = (self.name, self.value)
-		return super()._gen_repr(args, kwargs)
+		return (args, kwargs)
 __slots__ = ('_value', '_name')
 
 

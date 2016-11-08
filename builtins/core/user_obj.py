@@ -19,8 +19,6 @@ class UserObj(MathObj):
 		__class__.checktype(self)
 		super().__init__(*args, **kwargs)
 
-	def _gen_repr(self, args, kwargs):
-		return MathObj._gen_repr(self, args, kwargs) #bypasses any supers
 
 	@staticmethod
 	def __init_subclass__(*, is_pymath_userobj = False, **kwargs):

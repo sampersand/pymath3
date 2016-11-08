@@ -52,26 +52,39 @@ class UnseededFunction(NamedObj):
 
 		if self.base_func is not self._DEFAULT_BASE_FUNC:
 			kwargs['base_func'] = '<some function>'#self.base_func
+			print('yay')
 		if self.arglen is not self._DEFAULT_ARGLEN:
 			kwargs['arglen'] = self.arglen
 		if self.args_str is not self._DEFAULT_ARGS_STR:
 			kwargs['args_str'] = self.args_str
 		if self.body_str is not self._DEFAULT_BODY_STR:
 			kwargs['body_str'] = self.body_str
-		return super()._gen_repr(args, kwargs)
+		return (args, kwargs)
 
 	__slots__ = ('body_str', 'args_str', '_name')
 
 class UserUnseededFunction(UserObj, UnseededFunction, is_pymath_userobj=True):
-	def __init__(self, func, *, name = UnseededFunction._DEFAULT_NAME, ):
+	def __init__(self, func, name = UnseededFunction._DEFAULT_NAME):
 		super().__init__(base_func = func, name = name)
 
 
 	def _gen_repr(self, args, kwargs):
-		ret = super()._gen_repr(args, kwargs)
-		quit(str('ret') + repr(ret))
-		assert not args and not kwargs
-		if self.hasvalue():
-			args = (self.value, )
-		return super()._gen_repr(args, kwargs)
+		assert not args, args
+		assert not kwargs, kwargs
+		if self.base_func is not self._DEFAULT_BASE_FUNC:
+			args = (self.base_func,)
+		if self.hasname():
+			kwargs['name'] = self.name
+		return (args, kwargs)
+
+
+
+
+
+
+
+
+
+
+
 

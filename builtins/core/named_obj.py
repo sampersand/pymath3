@@ -70,7 +70,7 @@ class NamedObj(MathObj):
 		assert 'name' not in kwargs, kwargs
 		if self.hasname():
 			kwargs['name'] = repr(self.name)
-		return super()._gen_repr(args, kwargs)
+		return (args, kwargs)
 __all__ = ('NamedObj', )
 
 

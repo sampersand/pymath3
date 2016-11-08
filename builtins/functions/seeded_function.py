@@ -24,7 +24,11 @@ class SeededFunction(ValuedObj):
 	def __str__(self):
 		if self.hasvalue():
 			return str(self.value)
-		return '{}({})'.format(self.unseeded_base.name, *self)
+		if not self.unseeded_base.hasname():
+			name = '<Unnamed Function>'
+		else:
+			name = self.unseeded_base.name
+		return '{}({})'.format(name, ', '.join(str(x) for x in self))
 
 	def _gen_repr(self, args, kwargs):
 		assert 'unseeded_base' not in kwargs, kwargs

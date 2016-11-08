@@ -25,13 +25,15 @@ class MathObj():
 
 
 	def _gen_repr(self, args, kwargs):
+		return args, kwargs
+
+	def __repr__(self):
+		args, kwargs = self._gen_repr((), {})
 		return '{}({}{}{})'.format(tq(self), 
 		    ', '.join(repr(x) for x in args),
 			', ' if args and kwargs else '',
 			', '.join('{}={}'.format(key, repr(value)) for key, value in kwargs.items())
 			)
-	def __repr__(self):
-		return self._gen_repr((), {})
 
 	@classmethod
 	def checktype(cls, self):

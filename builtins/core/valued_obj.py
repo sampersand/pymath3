@@ -58,6 +58,7 @@ class ValuedObj(Operable):
 	@property
 	def solid_value(self):
 		return deepcopy(self.value)
+
 	def hasvalue(self):
 		''' Return true if this this class has a value. '''
 		return self.value != self._DEFAULT_VALUE
@@ -81,7 +82,7 @@ class ValuedObj(Operable):
 		assert 'value' not in kwargs, kwargs
 		if self.hasvalue():
 			kwargs['value'] = repr(self.value)
-		return super()._gen_repr(args, kwargs)
+		return (args, kwargs)
 
 __all__ = ('ValuedObj', )
 
