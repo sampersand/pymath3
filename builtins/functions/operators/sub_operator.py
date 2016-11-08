@@ -16,3 +16,4 @@ class SubOperator(NonCommutativeOperator): # 'x - y'.
 			else:
 				yield str(arg)
 
+	deriv_function = AddOperator.deriv_function

@@ -112,3 +112,5 @@ class Operator(UnseededFunction):
 					continue
 			yield str(arg)
 
+	def deriv_function(self, *args, du):
+		raise NotImplementedError

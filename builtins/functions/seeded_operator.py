@@ -16,4 +16,17 @@ class SeededOperator(SeededFunction):
 		return self.unseeded_base.format(self)
 	
 	def __derive__(self, other):
-		return self.unseeded_base.DERIV_FUNCTION(*self, du=other)
+		return self.unseeded_base.deriv_function(self, other)
+
+
+
+
+
+
+
+
+
+
+
+
+		
