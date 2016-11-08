@@ -1,29 +1,18 @@
 from functools import reduce
 from . import logger
-from . import MultiOperator, import_module
+from . import MultiOperator, import_module, CommutativeOperator
 if __debug__:
 	from . import SeededFunction
-class PowOperator(MultiOperator): # 'x ** y'.
+class PowOperator(CommutativeOperator): # 'x ** y'.
 	NAME = '**'
 	BASE_FUNC = staticmethod(lambda *args: reduce(lambda a, b: a ** b, args))
 
-	def _condense(self, args):
-		if len(args) < 2:
-			return args
-		return args
-		# if not args[0].hasvalue():
-		# 	pos = 1	
-		# 	while pos < len(args) and args[pos].hasvalue():
-		# 		pos += 1
-		# 	if pos > 2:
-		# 		return [args[0]] + [self(*args[1:pos])] + list(args[pos:])
-		# 	return args
-	@staticmethod
-	def _weed_out(args):
-		assert args
-		if args[0] in {0, 1}:
-			return args[0]
-		return [x for x in args if not x.hasvalue() or x.value != 1]
+	# @staticmethod
+	# def _weed_out(args):
+	# 	assert args
+	# 	if args[0] in {0, 1}:
+	# 		return args[0]
+	# 	return [x for x in args if not x.hasvalue() or x.value != 1]
 
 
 	def deriv_function(self, args, du, _ln = []):
@@ -69,19 +58,17 @@ class PowOperator(MultiOperator): # 'x ** y'.
 				yield PowOperator.POWS[-1]
 			elif x == '+':
 				yield PowOperator.POWS[-2]
+
 	def _format_get_parens(self, args): #for giggles
 		if len(args) == 2 and args[1].hasvalue():
 			b, p = args
 			p = p.value
 			assert isinstance(p, (int, float))
-
 			if self._needs_parens(b): argstr = '(%s)' % b
 			else: argstr = str(b)
-
 			yield argstr + ''.join(self._construct_pow(p))
-
 		else:
-			return super()._format_get_parens(args)
+			yield from super()._format_get_parens(args)
 
 
 

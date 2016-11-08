@@ -1,5 +1,4 @@
-from functools import reduce
-from . import NonCommutativeOperator, AddOperator
+from . import NonCommutativeOperator, AddOperator, reduce
 from . import SeededOperator
 class SubOperator(NonCommutativeOperator): # 'x - y'.
 	SPACES = AddOperator.SPACES
@@ -18,3 +17,17 @@ class SubOperator(NonCommutativeOperator): # 'x - y'.
 				yield str(arg)
 
 	deriv_function = AddOperator.deriv_function
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,4 +1,4 @@
-from . import MultiOperator
+from . import MultiOperator, SeededFunction
 class CommutativeOperator(MultiOperator):
 	_sort_args = staticmethod(lambda args: sorted(args, key = lambda a: not a.hasvalue()))
 
@@ -9,3 +9,4 @@ class CommutativeOperator(MultiOperator):
 	# 	if pos > 1:
 	# 		return [self(*args[0:pos])] + list(args[pos:])
 	# 	return args
+

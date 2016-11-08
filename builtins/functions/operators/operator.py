@@ -17,7 +17,10 @@ class Operator(UnseededFunction):
 
 	def _collapse_call_args(self, soper):
 		logger.info('TODO: fix _collapse_call_args to work with power')
-		START = 0
+		START = 0 
+		from .pow_operator import PowOperator
+		if isinstance(self, PowOperator):
+			START = -1
 		call_args = soper.call_args
 		from . import MultiOperator
 		if isinstance(call_args[START], SeededFunction) and call_args[START].unseeded_base is soper.unseeded_base\
@@ -40,11 +43,11 @@ class Operator(UnseededFunction):
 		-x - y - z  #weed out
 
 		'''
-		args = tuple(args)
+		args = list(args)
 
-		collapsed_args = self._format_collapse(args)
-		condensed_args = self._format_condense(collapsed_args)
-		weeded_out_args = self._format_weed_out(condensed_args)
+		condensed_args = self._format_condense(args)
+		collapsed_args = self._format_collapse(condensed_args)
+		weeded_out_args = self._format_weed_out(collapsed_args)
 		ret = self._format_complete(weeded_out_args)
 		assert isinstance(ret, str), ret
 		return ret
@@ -58,8 +61,25 @@ class Operator(UnseededFunction):
 		Into
 			-(10, x, y, 5, z, 5)
 		'''
+		i = 0
+		while i < len(args) -1: #so doesnt conflict with +1
+			if args[i].hasvalue() and args[i+1].hasvalue():
+				args[i] = self(args[i], args.pop(i+1))
+			else:
+				i += 1
 		return args
 
+
+	@staticmethod
+	def _sort_arg(arg):
+		if __debug__:
+			from pymath3.builtins.core.valued_obj import ValuedObj
+			assert isinstance(arg, ValuedObj)
+		if arg.hasvalue():
+			return 0
+		if isinstance(arg, SeededFunction):
+			return 2
+		return 1
 	def _format_condense(self, args):
 		'''
 		Turn 
@@ -67,7 +87,11 @@ class Operator(UnseededFunction):
 		Into
 			-(0, x, y, z)
 		'''
-		return args
+
+		return sorted(args, key=self._sort_arg)
+
+	# def _format_condense(self, args):
+	# 	return args
 	
 	def _format_weed_out(self, args):
 		'''
@@ -101,7 +125,7 @@ class Operator(UnseededFunction):
 	def _needs_parens(self, other):
 		if not isinstance(other, SeededOperator):
 			return False
-		return type(other.unseeded_base) in self.paren_classes
+		return type(other.unseeded_base) in self.paren_classes and not other.hasvalue()
 
 	def _gen_format_args(self, args):
 		for arg in args:
@@ -112,5 +136,9 @@ class Operator(UnseededFunction):
 					continue
 			yield str(arg)
 
-	def deriv_function(self, *args, du):
+	def deriv_function(self, args, du):
 		raise NotImplementedError
+
+
+
+

@@ -9,9 +9,14 @@ class Constant(ValuedObj):
 	robust.
 	'''
 	__slots__ = ('_value', )
-	_DEFAULT_VALUE = 0
 	def __str__(self):
 		return str(self.value)
+	@ValuedObj.value.getter
+	def value(self):
+		##TODO: FIX THIS
+		if self._value is not self._DEFAULT_VALUE:
+			return super().value
+		return 0
 
 	def isconst(self, du):
 		assert self is not du
