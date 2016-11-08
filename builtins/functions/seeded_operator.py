@@ -1,6 +1,6 @@
-from . import import_module, Integrable
+from . import import_module, Derivable
 from .seeded_function import SeededFunction
-class SeededOperator(Integrable, SeededFunction):
+class SeededOperator(Derivable, SeededFunction):
 	def __init__(self, **kwargs):
 		super().__init__(**kwargs)
 		if __debug__:
@@ -15,3 +15,5 @@ class SeededOperator(Integrable, SeededFunction):
 			return super().__str__()
 		return self.unseeded_base.format(self)
 	
+	def __derive__(self, other):
+		return self.unseeded_base.DERIV_FUNCTION(self, other)

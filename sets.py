@@ -11,7 +11,7 @@ class listoper():
 
 	def nlist(self, n):
 		L = len(self)
-		return ((self[i//L**j%L] for j in range(n)) for i in range(L**n))
+		return ((self[i//pow(L, j, L)] for j in range(n)) for i in range(L**n))
 		# for i in range(L**n):
 		# 	yield 
 	# @property
