@@ -1,4 +1,5 @@
-from . import MathObj, NamedObj
+from . import logger
+from . import MathObj, NamedObj, UserObj, tq
 from .seeded_function import SeededFunction
 
 class UnseededFunction(NamedObj):
@@ -20,7 +21,8 @@ class UnseededFunction(NamedObj):
 		self.body_str  = body_str  if body_str	is not None else self._DEFAULT_ARGLEN
 		self.args_str  = args_str  if args_str	is not None else self._DEFAULT_BODY_STR
 		self._arglen   = arglen    if arglen	is not None else self._DEFAULT_ARGS_STR
-
+		if not callable(self.base_func):
+			logger.warning("base_func of type '{}' is not callable!".format(tq(self.base_func)))
 	def __call__(self, *args):
 		return self.SEEDED_TYPE(unseeded_base = self, call_args = args)
 
@@ -60,18 +62,16 @@ class UnseededFunction(NamedObj):
 
 	__slots__ = ('body_str', 'args_str', '_name')
 
+class UserUnseededFunction(UserObj, UnseededFunction, is_pymath_userobj=True):
+	def __init__(self, func, *, name = UnseededFunction._DEFAULT_NAME, ):
+		super().__init__(base_func = func, name = name)
 
 
-
-
-
-
-
-
-
-
-
-
-
-
+	def _gen_repr(self, args, kwargs):
+		ret = super()._gen_repr(args, kwargs)
+		quit(str('ret') + repr(ret))
+		assert not args and not kwargs
+		if self.hasvalue():
+			args = (self.value, )
+		return super()._gen_repr(args, kwargs)
 
