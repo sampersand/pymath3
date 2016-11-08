@@ -4,7 +4,7 @@ from pymath3.builtins.functions.seeded_function import SeededFunction
 from pymath3.builtins.functions.seeded_operator import SeededOperator
 from pymath3.builtins.functions.unseeded_function import UnseededFunction
 
-
+from pymath3.utils import import_module
 
 
 from .operator import Operator

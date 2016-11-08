@@ -1,3 +1,4 @@
+from functools import reduce
 from . import NonCommutativeOperator, AddOperator
 from . import SeededOperator
 class SubOperator(NonCommutativeOperator): # 'x - y'.

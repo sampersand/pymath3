@@ -9,6 +9,10 @@ class SeededFunction(ValuedObj):
 
 	def __iter__(self):
 		return iter(self.call_args)
+	def __len__(self):
+		return len(self.call_args)
+	def __getitem__(self, item):
+		return self.call_args[item]
 
 	value = ValuedObj.value
 	@value.getter

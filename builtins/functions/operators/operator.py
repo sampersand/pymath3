@@ -54,7 +54,7 @@ class Operator(UnseededFunction):
 	def _format_collapse(self, args):
 		'''
 		Turn 
-			-(10, x, y, 1, 4, z, 5)
+			-(10, x, y, 6, 1, z, 5)
 		Into
 			-(10, x, y, 5, z, 5)
 		'''
