@@ -71,6 +71,19 @@ class NamedObj(MathObj):
 		if self.hasname():
 			kwargs['name'] = repr(self.name)
 		return (args, kwargs)
+
+	# def __eq__(self, other):
+	# 	if self is other:
+	# 		return True
+	# 	if hasattr(other, 'hasname'):
+	# 		if self.hasname() ^ other.hasname():
+	# 			return False
+	# 	if not hasattr(other, 'name'):
+	# 		return False
+	# 	return self.name == other.name
+
+
+
 __all__ = ('NamedObj', )
 
 

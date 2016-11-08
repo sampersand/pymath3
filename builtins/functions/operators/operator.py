@@ -19,7 +19,7 @@ class Operator(UnseededFunction):
 		logger.info('TODO: fix _collapse_call_args to work with power')
 		START = 0
 		call_args = soper.call_args
-
+		from . import MultiOperator
 		if isinstance(call_args[START], SeededFunction) and call_args[START].unseeded_base is soper.unseeded_base\
 			and isinstance(call_args[START].unseeded_base, MultiOperator):
 				if START == 0:

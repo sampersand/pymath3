@@ -83,19 +83,24 @@ class ValuedObj(Operable, Derivable):
 			kwargs['value'] = repr(self.value)
 		return (args, kwargs)
 
+	# def __eq__(self, other):
+	# 	if self is other:
+	# 		return True
 
-	def isconst(self, du):
-		if du.hasvalue():
-			logger.warning("du ({}) has a value!".format(du))
-		assert not du.hasvalue()
-		if __debug__:
-			from .variable import Variable
-			assert isinstance(du, Variable)
-		if self is du:
-			return False
-		if self.hasvalue():
-			return True
-		return False
+	# 	if hasattr(other, 'hasvalue'):
+	# 		if self.hasvalue() ^ other.hasvalue():
+	# 			return False
+
+	# 	if not hasattr(other, 'value'):
+	# 		return False
+
+	# 	return self.value == other.value
+
+
+	def __derive__(self, du):
+		return int(not self.isconst(du))
+
+
 __all__ = ('ValuedObj', )
 
 

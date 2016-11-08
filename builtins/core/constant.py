@@ -13,6 +13,10 @@ class Constant(ValuedObj):
 	def __str__(self):
 		return str(self.value)
 
+	def isconst(self, du):
+		assert self is not du
+		assert not du.hasvalue()
+		return True
 	
 class UserConstant(UserObj, Constant, is_pymath_userobj=True):
 	''' The UserObj for Constant

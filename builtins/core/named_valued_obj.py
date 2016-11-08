@@ -42,10 +42,10 @@ class NamedValuedObj(NamedObj, ValuedObj):
 
 		return super().__str__()
 
-
-
-
-
+	def isconst(self, du):
+		assert not du.hasvalue()
+		assert self is not du or not self.hasvalue()
+		return self is not du or self.hasvalue() or not self.hasname() or self.name != du.name
 
 
 

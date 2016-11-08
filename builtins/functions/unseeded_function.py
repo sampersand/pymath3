@@ -52,7 +52,6 @@ class UnseededFunction(NamedObj):
 
 		if self.base_func is not self._DEFAULT_BASE_FUNC:
 			kwargs['base_func'] = '<some function>'#self.base_func
-			print('yay')
 		if self.arglen is not self._DEFAULT_ARGLEN:
 			kwargs['arglen'] = self.arglen
 		if self.args_str is not self._DEFAULT_ARGS_STR:
