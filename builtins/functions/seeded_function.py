@@ -1,4 +1,4 @@
-from . import ValuedObj, scrub, MathObj
+from . import scrub, MathObj, ValuedObj
 class SeededFunction(ValuedObj):
 	def __init__(self, *, unseeded_base, call_args, **kwargs):
 		assert unseeded_base
@@ -14,6 +14,7 @@ class SeededFunction(ValuedObj):
 	@value.getter
 	def value(self):
 		return self.unseeded_base.base_func(*self)
+
 	def hasvalue(self):
 		if __debug__:
 			for x in self:

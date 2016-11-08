@@ -1,5 +1,6 @@
 from . import logger
 from .operable import Operable
+from copy import deepcopy
 
 class ValuedObj(Operable):
 	''' Represents an object that can have a value.
@@ -53,6 +54,10 @@ class ValuedObj(Operable):
 	def value(self):
 		self._value = self._DEFAULT_VALUE
 
+
+	@property
+	def solid_value(self):
+		return deepcopy(self.value)
 	def hasvalue(self):
 		''' Return true if this this class has a value. '''
 		return self.value != self._DEFAULT_VALUE

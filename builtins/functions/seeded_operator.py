@@ -1,7 +1,7 @@
-from . import import_module
+from . import import_module, Integrable
 from .seeded_function import SeededFunction
 MultiOperator = None
-class SeededOperator(SeededFunction):
+class SeededOperator(Integrable, SeededFunction):
 
 	def __init__(self, **kwargs):
 		super().__init__(**kwargs)

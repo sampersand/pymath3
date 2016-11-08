@@ -38,6 +38,11 @@ class Operator(UnseededFunction):
 	def format(self, *args):
 		raise NotImplementedError
 
+
+	@staticmethod
+	def _weed_out(args):
+		return args
+
 class MultiOperator(Operator):
 
 	def __init__(self, **kwargs):
@@ -47,28 +52,14 @@ class MultiOperator(Operator):
 	@Operator.base_func.getter
 	def base_func(self):
 		def capture(*args):
-			assert all(hasattr(a, 'hasvalue') for a in args)
-			assert all(a.hasvalue() for a in args)
-			assert all(hasattr(a, 'value') for a in args)
-			return type(self).BASE_FUNC(*(a.value for a in args))
+			assert all(hasattr(a, 'hasvalue') for a in args), [x for x in args if not hasattr(x, 'hasvalue')]
+			# assert all(a.hasvalue() for a in args), args
+			assert all(hasattr(a, 'value') for a in args), args
+			return type(self).BASE_FUNC(*(a.value if a.hasvalue() else a for a in args))
 		return capture
 
+	_sort_args = staticmethod(lambda args: args)
 
-
-	def _sort_args(self, args):
-		return sorted(args, key = lambda a: not a.hasvalue())
-
-	def _condense(self, args):
-		pos = 0
-		while pos < len(args) and args[pos].hasvalue():
-			pos += 1
-		if pos > 1:
-			return [self(*args[0:pos])] + list(args[pos:])
-		return args
-
-	@staticmethod
-	def _weed_out(args):
-		return args
 
 	def format(self, args):
 		args = tuple(args)
@@ -76,11 +67,25 @@ class MultiOperator(Operator):
 		args = tuple(self._condense(args))
 		args = tuple(self._weed_out(args))
 		return self._format_done(args)
+
 	def _format_done(self, args):
 		return '{}{}{}'.format(self.SPACES[0], self.NAME, self.SPACES[1]).join(self._gen_format_args(args))
 
+	def _condense(self, args):
+		return args
+class CommutativeOperator(MultiOperator):
+	_sort_args = staticmethod(lambda args: sorted(args, key = lambda a: not a.hasvalue()))
 
-class AddOperator(MultiOperator):
+	# def _condense(self, args):
+	# 	pos = 0
+	# 	while pos < len(args) and args[pos].hasvalue():
+	# 		pos += 1
+	# 	if pos > 1:
+	# 		return [self(*args[0:pos])] + list(args[pos:])
+	# 	return args
+
+
+class AddOperator(CommutativeOperator):
 	''' Operator representing the mathematical operation 'x + y'. '''
 	CLASSES_THAT_NEED_PARENS = ()
 	SPACES = (' ', ' ')
@@ -93,14 +98,15 @@ class AddOperator(MultiOperator):
 
 class SubOperator(MultiOperator):
 	''' Operator representing the mathematical operation 'x - y'. '''
-	CLASSES_THAT_NEED_PARENS = AddOperator.CLASSES_THAT_NEED_PARENS
+	CLASSES_THAT_NEED_PARENS = (AddOperator,)
 	SPACES = AddOperator.SPACES
 	NAME = '-'
 	BASE_FUNC = staticmethod(lambda *args: reduce(lambda a, b: a + b, args))
 
+	def _needs_parens(*a):
+		return 1
 
-
-class MulOperator(MultiOperator):
+class MulOperator(CommutativeOperator):
 	''' Operator representing the mathematical operation 'x * y'. '''
 	CLASSES_THAT_NEED_PARENS = (AddOperator, )
 	NAME = '*'
@@ -126,9 +132,6 @@ class TrueDivOperator(MultiOperator):
 	NAME = '/'
 	BASE_FUNC = staticmethod(lambda *args: reduce(lambda a, b: a / b, args))
 
-	def _sort_args(self, args):
-		return args
-
 	@staticmethod
 	def _weed_out(args):
 		assert args
@@ -141,7 +144,6 @@ class FloorDivOperator(MultiOperator):
 	NAME = '//'
 	BASE_FUNC = staticmethod(lambda *args: reduce(lambda a, b: a // b, args))
 
-	_sort_args = TrueDivOperator._sort_args
 	_weed_out = TrueDivOperator._weed_out
 
 class ModOperator(MultiOperator):
@@ -161,15 +163,17 @@ class UnaryOperator(Operator):
 	def base_func(self):
 		def capture(l):
 			assert hasattr(l, 'hasvalue')
-			assert l.hasvalue()
+			assert l.hasvalue(), l
 			assert hasattr(l, 'value')
 			return type(self).BASE_FUNC(l.value)
 		return capture
 
-	def format(self, *args):
-		assert len(args) == 1
-		fargs = self._gen_format_args(args)
 
+	def format(self, arg):
+		return self._format_done(arg)
+
+	def _format_done(self, args):
+		fargs = self._gen_format_args(args)
 		return '{}{}{}{}'.format(self.SPACES[0], self.NAME, self.SPACES[1], next(fargs))
 
 class NegOperator(UnaryOperator):
@@ -197,8 +201,6 @@ class PowOperator(MultiOperator):
 	NAME = '**'
 	BASE_FUNC = staticmethod(lambda *args: reduce(lambda a, b: a ** b, args))
 	_START_END = -1
-	def _sort_args(self, args):
-		return args
 
 	def _condense(self, args):
 		if len(args) < 2:
@@ -211,7 +213,6 @@ class PowOperator(MultiOperator):
 		# 	if pos > 2:
 		# 		return [args[0]] + [self(*args[1:pos])] + list(args[pos:])
 		# 	return args
-
 
 	@staticmethod
 	def _weed_out(args):
