@@ -13,7 +13,7 @@ class ValuedObj(Operable, Derivable):
 	_DEFAULT_VALUE = None
 	_ALLOWED_VALUE_TYPES = (int, float, bool, complex, type(None))
 
-	def __init__(self, *args, value = None, **kwargs):
+	def __init__(self, *args, value = None, **kwgs):
 		''' Initializes self with 'value'
 		
 		This class is meant to be subclassed, and shouldn't be instanced directly. If attempted, a
@@ -22,7 +22,7 @@ class ValuedObj(Operable, Derivable):
 		Arguments:
 			*args    -- Ignored
 			value    -- The value of this class. (default: None)
-			**kwargs -- Ignored
+			**kwgs -- Ignored
 		Returns:
 			None
 		'''
@@ -32,7 +32,7 @@ class ValuedObj(Operable, Derivable):
 		if value is None:
 			value = self._DEFAULT_VALUE
 		self.value = value
-		super().__init__(*args, **kwargs)
+		super().__init__(*args, **kwgs)
 
 
 	value = property(doc = "The resulting value of this class")
@@ -77,11 +77,11 @@ class ValuedObj(Operable, Derivable):
 
 		return super().__str__()
 
-	def _gen_repr(self, args, kwargs):
-		assert 'value' not in kwargs, kwargs
+	def _gen_repr(self, args, kwgs):
+		assert 'value' not in kwgs, kwgs
 		if self.hasvalue():
-			kwargs['value'] = repr(self.value)
-		return (args, kwargs)
+			kwgs['value'] = repr(self.value)
+		return (args, kwgs)
 
 	def isconst(self, du):
 		assert self is not du

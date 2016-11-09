@@ -1,8 +1,8 @@
 from . import Operator
 class MultiOperator(Operator):
 
-	def __init__(self, **kwargs):
-		super().__init__(**kwargs)
+	def __init__(self, **kwgs):
+		super().__init__(**kwgs)
 		# assert self.arglen == 2, self.arglen
 
 	@Operator.base.getter

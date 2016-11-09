@@ -10,7 +10,7 @@ class NamedObj(MathObj):
 	_DEFAULT_NAME = None
 	_ALLOWED_NAME_TYPES = (str, bytes, type(None))
 
-	def __init__(self, *args, name = None, **kwargs):
+	def __init__(self, *args, name = None, **kwgs):
 		'''Initialize self.
 
 		This class is meant to be subclassed, and shouldn't be instanced directly. If attempted, a
@@ -19,7 +19,7 @@ class NamedObj(MathObj):
 		Arguments:
 			*args    -- Ignored
 			name     -- The name of this class. (default: None)
-			**kwargs -- Ignored
+			**kwgs -- Ignored
 		Returns:
 			None
 		'''
@@ -28,7 +28,7 @@ class NamedObj(MathObj):
 		if name is None:
 			name = self._DEFAULT_NAME
 		self.name = name
-		super().__init__(*args, **kwargs)
+		super().__init__(*args, **kwgs)
 
 
 	name = property(doc = "The name of this class")
@@ -66,11 +66,11 @@ class NamedObj(MathObj):
 		return super().__str__()
 
 
-	def _gen_repr(self, args, kwargs):
-		assert 'name' not in kwargs, kwargs
+	def _gen_repr(self, args, kwgs):
+		assert 'name' not in kwgs, kwgs
 		if self.hasname():
-			kwargs['name'] = repr(self.name)
-		return (args, kwargs)
+			kwgs['name'] = repr(self.name)
+		return (args, kwgs)
 
 	# def __eq__(self, other):
 	# 	if self is other:

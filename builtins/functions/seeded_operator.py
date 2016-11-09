@@ -1,8 +1,8 @@
 from . import import_module
 from .seeded_function import SeededFunction
 class SeededOperator(SeededFunction):
-	def __init__(self, **kwargs):
-		super().__init__(**kwargs)
+	def __init__(self, **kwgs):
+		super().__init__(**kwgs)
 		if __debug__:
 			from .operators import Operator
 			assert isinstance(self.base, Operator)

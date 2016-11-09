@@ -41,11 +41,11 @@ class UserConstant(UserObj, Constant, is_pymath_userobj=True):
 		super().__init__(value = value)
 
 
-	def _gen_repr(self, args, kwargs):
-		assert not args and not kwargs
+	def _gen_repr(self, args, kwgs):
+		assert not args and not kwgs
 		if self.hasvalue():
 			args = (self.value, )
-		return args, kwargs
+		return args, kwgs
 
 	__slots__ = ('_value', )
 

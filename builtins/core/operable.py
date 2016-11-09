@@ -8,7 +8,7 @@ class Operable(MathObj):
 	warning will be logged.
 	'''
 
-	def __init__(self, *args, **kwargs):
+	def __init__(self, *args, **kwgs):
 		''' Instantiates self.
 
 		This class is meant to be subclassed, and shouldn't be instanced directly. If attempted, a
@@ -16,13 +16,13 @@ class Operable(MathObj):
 
 		Arguments:
 			*args    -- Ignored
-			**kwargs -- Ignored
+			**kwgs -- Ignored
 		Returns:
 			None
 		'''
 
 		__class__.checktype(self)
-		super().__init__(**kwargs)
+		super().__init__(**kwgs)
 
 
 	def _do(self, func, *args):

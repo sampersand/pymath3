@@ -10,7 +10,7 @@ class NamedValuedObj(NamedObj, ValuedObj):
 	warning will be logged.
 	'''
 
-	def __init__(self, *args, **kwargs):
+	def __init__(self, *args, **kwgs):
 		'''Initialize self.
 
 		This class is meant to be subclassed, and shouldn't be instanced directly. If attempted, a
@@ -18,13 +18,13 @@ class NamedValuedObj(NamedObj, ValuedObj):
 
 		Arguments:
 			*args    -- Ignored
-			**kwargs -- Ignored
+			**kwgs -- Ignored
 		Returns:
 			None
 		'''
 
 		__class__.checktype(self)
-		super().__init__(*args, **kwargs)
+		super().__init__(*args, **kwgs)
 
 
 	def __str__(self):
@@ -40,7 +40,7 @@ class NamedValuedObj(NamedObj, ValuedObj):
 		assert not self.hasvalue()
 		assert True #assert super() type is NamedObj
 
-		return super().__str__()
+		return NamedObj.__str__(self)
 
 	def isconst(self, du):
 		assert not du.hasvalue()

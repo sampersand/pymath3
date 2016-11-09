@@ -7,7 +7,7 @@ class MathObj():
 	warning will be logged.
 	'''
 
-	def __init__(self, *args, **kwargs):
+	def __init__(self, *args, **kwgs):
 		'''Initialize self.
 
 		This class is meant to be subclassed, and shouldn't be instanced directly. If attempted, a
@@ -15,24 +15,24 @@ class MathObj():
 
 		Arguments:
 			*args    -- Ignored
-			**kwargs -- Ignored
+			**kwgs -- Ignored
 		Returns:
 			None
 		'''
 		__class__.checktype(self)
-		super().__init__(*args, **kwargs)
+		super().__init__(*args, **kwgs)
 
 
 
-	def _gen_repr(self, args, kwargs):
-		return args, kwargs
+	def _gen_repr(self, args, kwgs):
+		return args, kwgs
 
 	def __repr__(self):
-		args, kwargs = self._gen_repr((), {})
+		args, kwgs = self._gen_repr((), {})
 		return '{}({}{}{})'.format(tq(self), 
 		    ', '.join(repr(x) for x in args),
-			', ' if args and kwargs else '',
-			', '.join('{}={}'.format(key, repr(value)) for key, value in kwargs.items())
+			', ' if args and kwgs else '',
+			', '.join('{}={}'.format(key, repr(value)) for key, value in kwgs.items())
 			)
 
 	@classmethod

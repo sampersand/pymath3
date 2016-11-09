@@ -35,17 +35,17 @@ class UserVariable(UserObj, Variable, is_pymath_userobj=True):
 		'''
 		super().__init__(name = name, value = value)
 
-	def _gen_repr(self, args, kwargs):
-		assert not args and not kwargs
+	def _gen_repr(self, args, kwgs):
+		assert not args and not kwgs
 		# return super()
 		if self.hasname():
 			args = (self.name, )
 		if self.hasvalue():
 			if not args:
-				kwargs = {'value': self.value}
+				kwgs = {'value': self.value}
 			else:
 				args = (self.name, self.value)
-		return (args, kwargs)
+		return (args, kwgs)
 
 	__slots__ = ('_value', '_name')
 

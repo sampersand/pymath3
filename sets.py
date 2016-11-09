@@ -1,11 +1,9 @@
-def check(ppl):
-	mutuals = {}
-	for (p1, p2), status in ppl.items():
-		
+args = 0.2
+kwgs = 0.3
 
-ppl = {
-	'ab': 1,
-	'ac': 1
-}
-check(ppl)
-
+item = [1, 3, 4]
+# [1] + [0.2, 0.3] = [1, 0.1, 0.3]
+# [1, 2] + [0.2] = [1, 2, 0.3]
+# [1, 2, 3] + [] = [1, 2, 3]
+amnt, args, kwgs = item + [args, kwgs][len(item) -1:]
+print(amnt, args, kwgs)

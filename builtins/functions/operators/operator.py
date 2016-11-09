@@ -6,8 +6,8 @@ class Operator(UnseededFunction):
 	NAME, BASE_FUNC = None, None
 	SPACES = ('', '')
 	if __debug__:
-		def __init__(self, *args, **kwargs):
-			super().__init__(*args, **kwargs)
+		def __init__(self, *args, **kwgs):
+			super().__init__(*args, **kwgs)
 
 	@UnseededFunction.name.getter
 	def name(self):

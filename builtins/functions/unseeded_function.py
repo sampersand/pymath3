@@ -11,14 +11,14 @@ class UnseededFunction(NamedObj):
 	_DEFAULT_BASE_FUNC = None
 	_DEFAULT_ARGS_STR = None
 	_DEFAULT_BODY_STR = None
-	_ALLOWED_BASE_FUNC_TYPES = (LambdaType, FunctionType, MethodType)
+	_ALLOWED_BASE_FUNC_TYPES = (LambdaType, FunctionType, MethodType, type(None))
 	def __init__(self, *,
 			base = None,
 			arglen = None,
 			body_str = None,
 			args_str = None,
-			**kwargs):
-		super().__init__(**kwargs)
+			**kwgs):
+		super().__init__(**kwgs)
 		self.base = base if base	is not None else self._DEFAULT_BASE_FUNC
 		self.body_str  = body_str  if body_str	is not None else self._DEFAULT_ARGLEN
 		self.args_str  = args_str  if args_str	is not None else self._DEFAULT_BODY_STR
@@ -50,37 +50,63 @@ class UnseededFunction(NamedObj):
 		return self.base.__code__.co_argcount
 
 
-	def _gen_repr(self, args, kwargs):
-		assert 'base' not in kwargs, kwargs
-		assert 'arglen' not in kwargs, kwargs
-		assert 'args_str' not in kwargs, kwargs
-		assert 'body_str' not in kwargs, kwargs
+	def _gen_repr(self, args, kwgs):
+		assert 'base' not in kwgs, kwgs
+		assert 'arglen' not in kwgs, kwgs
+		assert 'args_str' not in kwgs, kwgs
+		assert 'body_str' not in kwgs, kwgs
 
 		if self.base is not self._DEFAULT_BASE_FUNC:
-			kwargs['base'] = '<some function>'#self.base
+			kwgs['base'] = '<some function>'#self.base
 		if self.arglen is not self._DEFAULT_ARGLEN:
-			kwargs['arglen'] = self.arglen
+			kwgs['arglen'] = self.arglen
 		if self.args_str is not self._DEFAULT_ARGS_STR:
-			kwargs['args_str'] = self.args_str
+			kwgs['args_str'] = self.args_str
 		if self.body_str is not self._DEFAULT_BODY_STR:
-			kwargs['body_str'] = self.body_str
-		return (args, kwargs)
+			kwgs['body_str'] = self.body_str
+		return (args, kwgs)
 
-	__slots__ = ('body_str', 'args_str', '_name')
+	def __str__(self):
+		return '{}({}) = {}'.format(self.name, self.args_str, self.body_str)
 
+	__slots__ = ('body_str', 'args_str')
+
+
+	def __or__(self, args):
+		'''
+		f | (a, b) --> f(a) - f(b)
+		used in calculus for calculating definite integrals
+		'''
+		args = list(args)
+		if len(args) != 2:
+			raise IndexError('Can only do f | (a, b) --> f(a) - f(b)')
+		if not hasattr(args[0], '__iter__'):
+			assert not hasattr(args[0], '__len__')
+			assert not hasattr(args[1], '__len__')
+			logger.debug("'a' ({}) in (a, b) doesn't have a __iter__ method; making it into a single-value tuple")
+			args[0] = args[0],
+		if not hasattr(args[1], '__iter__'):
+			assert not hasattr(args[1], '__len__')
+			logger.debug("'b' ({})  in (a, b) doesn't have a __iter__ method; making it into a single-value tuple")
+			args[1] = args[1],
+		if len(args[1]) != self.arglen:
+			raise IndexError("Expected 'a' in (a, b) to be length {}, not {}".format(self.arglen, len(args[0])))
+		if len(args[1]) != self.arglen:
+			raise IndexError("Expected 'b' in (a, b) to be length {}, not {}".format(self.arglen, len(args[1])))
+		return self(*args[0]) - self(*args[1])
 class UserUnseededFunction(UserObj, UnseededFunction, is_pymath_userobj=True):
 	def __init__(self, func, name = UnseededFunction._DEFAULT_NAME):
 		super().__init__(base = func, name = name)
 
 
-	def _gen_repr(self, args, kwargs):
+	def _gen_repr(self, args, kwgs):
 		assert not args, args
-		assert not kwargs, kwargs
+		assert not kwgs, kwgs
 		if self.base is not self._DEFAULT_BASE_FUNC:
 			args = (self.base,)
 		if self.hasname():
-			kwargs['name'] = self.name
-		return (args, kwargs)
+			kwgs['name'] = self.name
+		return (args, kwgs)
 
 	def __matmul__(self, other):
 		return self(*other)
