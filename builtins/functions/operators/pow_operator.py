@@ -1,9 +1,9 @@
 from functools import reduce
 from . import logger
-from . import MultiOperator, import_module, CommutativeOperator
+from . import MultiOperator, import_module, NonCommutativeOperator
 if __debug__:
 	from . import SeededFunction
-class PowOperator(CommutativeOperator): # 'x ** y'.
+class PowOperator(NonCommutativeOperator): # 'x ** y'.
 	NAME = '**'
 	BASE_FUNC = staticmethod(lambda *args: reduce(lambda a, b: a ** b, args))
 
@@ -69,6 +69,41 @@ class PowOperator(CommutativeOperator): # 'x ** y'.
 			yield argstr + ''.join(self._construct_pow(p))
 		else:
 			yield from super()._format_get_parens(args)
+
+
+	def _format_condense(self, args):
+		return args
+
+
+	@staticmethod
+	def _format_weed_out(args):
+		i = 0
+		while i < len(args) - 1:
+			if args[i].value == 1:
+				args = args[:i]
+				break
+			if args[i].value == 0:
+				if i == 0:
+					args = [args[i]]
+				else:
+					args = args[:i-1]
+					break
+			i += 1
+		print([str(x) for x in args])
+		return args
+
+		# yield from (x for x in args[1:] if not x.hasvalue() or x.value != 1)
+
+
+
+
+
+
+
+
+
+
+
 
 
 

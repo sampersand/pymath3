@@ -2,11 +2,17 @@ from . import MultiOperator, SeededFunction
 class CommutativeOperator(MultiOperator):
 	_sort_args = staticmethod(lambda args: sorted(args, key = lambda a: not a.hasvalue()))
 
-	# def _condense(self, args):
-	# 	pos = 0
-	# 	while pos < len(args) and args[pos].hasvalue():
-	# 		pos += 1
-	# 	if pos > 1:
-	# 		return [self(*args[0:pos])] + list(args[pos:])
-	# 	return args
+	@staticmethod
+	def _sort_arg(arg):
+		if __debug__:
+			from pymath3.builtins.core.valued_obj import ValuedObj
+			assert isinstance(arg, ValuedObj)
+		if arg.hasvalue():
+			return 0
+		if isinstance(arg, SeededFunction):
+			return 2
+		return 1
+	def _format_condense(self, args):
+
+		return sorted(args, key=self._sort_arg)
 

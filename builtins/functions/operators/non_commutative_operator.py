@@ -1,6 +1,15 @@
-from . import MultiOperator
+from . import MultiOperator, SeededFunction
 class NonCommutativeOperator(MultiOperator):
 	pass
-	# @classmethod
-	# def __init_subclass__(cls, *args):
-	# 	cls.paren_classes |= {cls}
+	@staticmethod
+	def _sort_arg(arg):
+		if __debug__:
+			from pymath3.builtins.core.valued_obj import ValuedObj
+			assert isinstance(arg, ValuedObj)
+		if arg.hasvalue():
+			return 0
+		if isinstance(arg, SeededFunction):
+			return 2
+		return 1
+	def _format_condense(self, args):
+		return [args[0]] + sorted(args[1:], key=self._sort_arg)

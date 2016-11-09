@@ -70,16 +70,6 @@ class Operator(UnseededFunction):
 		return args
 
 
-	@staticmethod
-	def _sort_arg(arg):
-		if __debug__:
-			from pymath3.builtins.core.valued_obj import ValuedObj
-			assert isinstance(arg, ValuedObj)
-		if arg.hasvalue():
-			return 0
-		if isinstance(arg, SeededFunction):
-			return 2
-		return 1
 	def _format_condense(self, args):
 		'''
 		Turn 
@@ -87,11 +77,7 @@ class Operator(UnseededFunction):
 		Into
 			-(0, x, y, z)
 		'''
-
-		return sorted(args, key=self._sort_arg)
-
-	# def _format_condense(self, args):
-	# 	return args
+		return args
 	
 	def _format_weed_out(self, args):
 		'''
@@ -102,7 +88,7 @@ class Operator(UnseededFunction):
 		'''
 		return args
 
-
+	_FORMAT_JOINER = '{0}{2}{1}'
 	def _format_complete(self, args):
 		'''
 		Turn 
@@ -111,7 +97,7 @@ class Operator(UnseededFunction):
 			x - y - z
 		'''
 
-		joiner = '{0}{2}{1}'.format(*self.SPACES, self.NAME)
+		joiner = self._FORMAT_JOINER.format(*self.SPACES, self.NAME)
 		return joiner.join(self._format_get_parens(args))
 
 	def _format_get_parens(self, args):
@@ -126,15 +112,6 @@ class Operator(UnseededFunction):
 		if not isinstance(other, SeededOperator):
 			return False
 		return type(other.unseeded_base) in self.paren_classes and not other.hasvalue()
-
-	def _gen_format_args(self, args):
-		for arg in args:
-			if isinstance(arg, SeededOperator) and not arg.hasvalue():
-				assert isinstance(arg.unseeded_base, Operator)
-				if self._needs_parens(type(arg.unseeded_base)): #only thing that needs parens are SeededOperator
-					yield '(' + str(arg) + ')'
-					continue
-			yield str(arg)
 
 	def deriv_function(self, args, du):
 		raise NotImplementedError

@@ -16,5 +16,6 @@ class UnaryOperator(Operator):
 		return self._format_done(arg)
 
 	def _format_done(self, args):
+		assert 0, 'todo'
 		fargs = self._gen_format_args(args)
 		return '{}{}{}{}'.format(self.SPACES[0], self.NAME, self.SPACES[1], next(fargs))

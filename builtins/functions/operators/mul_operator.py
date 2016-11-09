@@ -18,3 +18,26 @@ class MulOperator(CommutativeOperator): # 'x * y'.
 			else:
 				ret += res
 		return ret
+
+	@staticmethod
+	def _format_weed_out(args):
+		if any(arg.value == 0 for arg in args):
+			return (0,)
+		return tuple(x for x in args if not x.hasvalue() or x.value != 1)
+
+	_FORMAT_JOINER = ''
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
