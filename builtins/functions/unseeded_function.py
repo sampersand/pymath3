@@ -94,7 +94,7 @@ class UnseededFunction(NamedObj):
 		if len(args[1]) != self.arglen:
 			raise IndexError("Expected 'b' in (a, b) to be length {}, not {}".format(self.arglen, len(args[1])))
 		return self(*args[0]) - self(*args[1])
-class UserUnseededFunction(UserObj, UnseededFunction, is_pymath_userobj=True):
+class UserUnseededFunction(UserObj, UnseededFunction):
 	def __init__(self, func, name = UnseededFunction._DEFAULT_NAME):
 		super().__init__(base = func, name = name)
 

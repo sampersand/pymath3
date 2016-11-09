@@ -11,10 +11,9 @@ logger = logging.getLogger(__name__)
 
 import pymath3.utils as utils
 tq = utils.tq
-SystemMeta = utils.SystemMeta
-
 from .builtins import *
 
+SystemMeta = utils.SystemMeta
 
 
 __all__ = [x for x in list(locals()) if x[0] != '_']

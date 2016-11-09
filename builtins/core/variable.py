@@ -13,7 +13,7 @@ class Variable(NamedValuedObj):
 	warning will be logged.
 	'''
 
-class UserVariable(UserObj, Variable, is_pymath_userobj=True):
+class UserVariable(UserObj, Variable):
 	''' The UserObj for Variable
 
 	See UserObj for more information on User objects.

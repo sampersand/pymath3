@@ -23,7 +23,7 @@ class Constant(ValuedObj):
 		assert not du.hasvalue()
 		return True
 	
-class UserConstant(UserObj, Constant, is_pymath_userobj=True):
+class UserConstant(UserObj, Constant):
 	''' The UserObj for Constant
 
 	See UserObj for more information on User objects.
