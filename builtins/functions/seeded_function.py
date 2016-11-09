@@ -1,5 +1,6 @@
 from . import scrub, MathObj, ValuedObj
 class SeededFunction(ValuedObj):
+
 	def __init__(self, *, unseeded_base, call_args, **kwargs):
 		assert unseeded_base
 		self.unseeded_base = unseeded_base

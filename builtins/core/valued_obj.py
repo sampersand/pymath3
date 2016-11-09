@@ -83,6 +83,10 @@ class ValuedObj(Operable, Derivable):
 			kwargs['value'] = repr(self.value)
 		return (args, kwargs)
 
+	def isconst(self, du):
+		assert self is not du
+		return self.hasvalue()
+
 	# def __eq__(self, other):
 	# 	if self is other:
 	# 		return True

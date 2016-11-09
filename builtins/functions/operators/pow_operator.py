@@ -60,6 +60,8 @@ class PowOperator(NonCommutativeOperator): # 'x ** y'.
 				yield PowOperator.POWS[-2]
 
 	def _format_get_parens(self, args, fancy): #for giggles
+		logger.info('fancy is set to false temp')
+		fancy = 0
 		if len(args) == 2 and args[1].hasvalue() and fancy:
 			b, p = args
 			p = p.value

@@ -16,7 +16,6 @@ class Operator(UnseededFunction):
 
 
 	def _collapse_call_args(self, soper):
-		logger.info('TODO: fix _collapse_call_args to work with power')
 		START = 0 
 		from .pow_operator import PowOperator
 		if isinstance(self, PowOperator):

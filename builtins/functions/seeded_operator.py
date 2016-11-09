@@ -14,9 +14,9 @@ class SeededOperator(SeededFunction):
 		if self.hasvalue():
 			return super().__str__()
 		return self.unseeded_base.format(self)
-	
+
 	def __derive__(self, other):
-		return self.unseeded_base.deriv_function(self, other)
+		return self.unseeded_base.deriv_function(args = self, du = other)
 
 
 
