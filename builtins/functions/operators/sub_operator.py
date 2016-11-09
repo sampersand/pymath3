@@ -5,7 +5,7 @@ class SubOperator(NonCommutativeOperator): # 'x - y'.
 	NAME = '-'
 	BASE_FUNC = staticmethod(lambda *args: reduce(lambda a, b: a - b, args))
 
-	def _format_get_parens(self, args):
+	def _format_get_parens(self, args, fancy):
 		assert args
 		if isinstance(args[0], SeededOperator) and isinstance(args[0].unseeded_base, AddOperator):
 			yield str(args[0])

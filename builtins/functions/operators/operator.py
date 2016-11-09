@@ -35,7 +35,7 @@ class Operator(UnseededFunction):
 	#str functions
 
 
-	def format(self, args):
+	def format(self, args, fancy = True):
 		'''
 		10 - x - y - 1 - 4 - z - 5 #start
 		10 - x - y - 5 - z - 5 #collapse
@@ -45,62 +45,78 @@ class Operator(UnseededFunction):
 		'''
 		args = list(args)
 
-		condensed_args = self._format_condense(args)
-		collapsed_args = self._format_collapse(condensed_args)
-		weeded_out_args = self._format_weed_out(collapsed_args)
-		ret = self._format_complete(weeded_out_args)
+		condensed_args = list(self._format_condense(args, fancy))
+		collapsed_args = list(self._format_collapse(condensed_args, fancy))
+		conjoined_args = list(self._format_conjoin(collapsed_args, fancy))
+		weeded_out_args = list(self._format_weed_out(conjoined_args, fancy))
+		# print([str(x) for x in args])
+		ret = self._format_complete(weeded_out_args, fancy)
 		assert isinstance(ret, str), ret
 		return ret
 
 
 
-	def _format_collapse(self, args):
+	def _format_collapse(self, args, fancy):
 		'''
 		Turn 
-			-(10, x, y, 6, 1, z, 5)
+			-(10, 3x, y, 6, 1, z, 5, x)
 		Into
-			-(10, x, y, 5, z, 5)
+			-(10, 3x, y, 5, z, 5, x)
 		'''
 		i = 0
 		while i < len(args) -1: #so doesnt conflict with +1
 			if args[i].hasvalue() and args[i+1].hasvalue():
-				args[i] = self(args[i], args.pop(i+1))
+				toins = self(args.pop(i), args.pop(i))
+				args = args[:i] + list(toins) + args[i:]
+				i+=len(toins)+1
+
 			else:
 				i += 1
 		return args
 
 
-	def _format_condense(self, args):
+	def _format_condense(self, args, fancy):
 		'''
 		Turn 
-			-(10, x, y, 5, z, 5)
+			-(10, 3x, y, 5, z, 5, x)
 		Into
-			-(0, x, y, z)
+			-(0, 3x, y, z, x)
 		'''
 		return args
 	
-	def _format_weed_out(self, args):
+	def _format_weed_out(self, args, fancy):
 		'''
 		Turn 
-			-(0, x, y, z)
+			-(0, 3x, y, z, x)
 		Into
-			-(x, y, z)
+			-(3x, y, z, x)
+		'''
+		return args
+	
+	def _format_conjoin(self, args, fancy):
+		'''
+		Turn 
+			-(3x, y, z, x)
+		Into
+			-(2x, y, z)
 		'''
 		return args
 
-	_FORMAT_JOINER = '{0}{2}{1}'
-	def _format_complete(self, args):
+	def _get_FORMAT_JOINER(self, fancy):
+		return '{0}{2}{1}'
+
+	def _format_complete(self, args, fancy):
 		'''
 		Turn 
-			-(x, y, z)
+			-(2x, y, z)
 		Into
-			x - y - z
+			2x - y - z
 		'''
 
-		joiner = self._FORMAT_JOINER.format(*self.SPACES, self.NAME)
-		return joiner.join(self._format_get_parens(args))
+		joiner = self._get_FORMAT_JOINER(fancy).format(*self.SPACES, self.NAME)
+		return joiner.join(self._format_get_parens(args, fancy))
 
-	def _format_get_parens(self, args):
+	def _format_get_parens(self, args, fancy):
 		for arg in args:
 			if self._needs_parens(arg):
 				yield '(%s)' % arg

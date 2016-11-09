@@ -11,5 +11,5 @@ class NonCommutativeOperator(MultiOperator):
 		if isinstance(arg, SeededFunction):
 			return 2
 		return 1
-	def _format_condense(self, args):
+	def _format_condense(self, args, fancy):
 		return [args[0]] + sorted(args[1:], key=self._sort_arg)

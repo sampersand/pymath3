@@ -19,16 +19,17 @@ from .pos_operator import PosOperator
 from .neg_operator import NegOperator
 from .invert_operator import InvertOperator
 
+from .pow_operator import PowOperator #for pow
+from .mul_operator import MulOperator #for add
+
 from .add_operator import AddOperator
 from .sub_operator import SubOperator
 
-from .mul_operator import MulOperator
 from .truediv_operator import TrueDivOperator
 from .floordiv_operator import FloorDivOperator
 from .mod_operator import ModOperator
 from .mmul_operator import MMulOperator
 
-from .pow_operator import PowOperator
 
 
 def setup():
