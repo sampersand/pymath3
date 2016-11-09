@@ -36,11 +36,12 @@ class Operator(UnseededFunction):
 
 	def format(self, args, fancy = True):
 		'''
-		10 - x - y - 1 - 4 - z - 5 #start
-		10 - x - y - 5 - z - 5 #collapse
-		0 - x - y - z  #condensed
-		-x - y - z  #weed out
-
+		-(10, 3x, y, 4, 1, z, 5, x)
+		-(10, 4, 1, 5, 3x, y, z, x)
+		-(0, 3x, y, z, x)
+		-(3x, y, z, x)
+		-(2x, y, z)
+		2x - y - z
 		'''
 		args = list(args)
 
@@ -54,12 +55,22 @@ class Operator(UnseededFunction):
 
 
 
+	def _format_condense(self, args, fancy):
+		'''
+		Turn 
+			-(10, 3x, y, 4, 1, z, 5, x)
+		Into
+			-(10, 4, 1, 5, 3x, y, z, x)
+		'''
+		return args
+
+	
 	def _format_collapse(self, args, fancy):
 		'''
 		Turn 
-			-(10, 3x, y, 6, 1, z, 5, x)
+			-(10, 4, 1, 5, 3x, y, z, x)
 		Into
-			-(10, 3x, y, 5, z, 5, x)
+			-(0, 3x, y, z, x)
 		'''
 		i = 0
 		while i < len(args) -1: #so doesnt conflict with +1
@@ -72,30 +83,22 @@ class Operator(UnseededFunction):
 		return args
 
 
-	def _format_condense(self, args, fancy):
-		'''
-		Turn 
-			-(10, 3x, y, 5, z, 5, x)
-		Into
-			-(0, 3x, y, z, x)
-		'''
-		return args
 	
 	def _format_weed_out(self, args, fancy):
 		'''
 		Turn 
 			-(0, 3x, y, z, x)
 		Into
-			-(3x, y, z, x)
+			-(-3x, y, z, x)
 		'''
 		return args
 	
 	def _format_conjoin(self, args, fancy):
 		'''
 		Turn 
-			-(3x, y, z, x)
+			-(-3x, y, z, x)
 		Into
-			-(2x, y, z)
+			-(-4x, y, z)
 		'''
 		return args
 
@@ -105,9 +108,9 @@ class Operator(UnseededFunction):
 	def _format_complete(self, args, fancy):
 		'''
 		Turn 
-			-(2x, y, z)
+			-(-4x, y, z)
 		Into
-			2x - y - z
+			-4x - y - z
 		'''
 
 		joiner = self._get_FORMAT_JOINER(fancy).format(*self.SPACES, self.NAME)
@@ -124,7 +127,13 @@ class Operator(UnseededFunction):
 	def _needs_parens(self, other):
 		if not isinstance(other, SeededOperator):
 			return False
-		return type(other.unseeded_base) in self.paren_classes and not other.hasvalue()
+		if type(other.unseeded_base) in self.paren_classes:
+			if other.hasvalue():
+				return False
+			if set(str(other)) - set('0123456789-+.'):
+				return True
+			return False
+		return False
 
 	def deriv_function(self, args, du):
 		raise NotImplementedError

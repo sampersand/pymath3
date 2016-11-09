@@ -10,11 +10,10 @@ class AddOperator(CommutativeOperator): # 'x + y'.
 	@staticmethod
 	def _format_weed_out(args, fancy):
 		for x in args:
-			#this is bad
-			if str(x) == '0':
+			
+			if str(x) == '0': #this is bad
 				continue
-			if not x.hasvalue():
-				yield x
+			yield x
 		# return (x for x in args if not x.hasvalue() or x.value != 0)
 
 	@staticmethod

@@ -1,4 +1,5 @@
 LOGGING_LEVEL = 'DEBUG'
+LOGGING_LEVEL = 'INFO'
 LOGGING_FORMAT = '[{asctime}][{levelname:<5}] {funcName} :: {message}'
 LOGGING_STYLE = '{'
 import logging
