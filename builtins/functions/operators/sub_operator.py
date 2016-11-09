@@ -7,7 +7,7 @@ class SubOperator(NonCommutativeOperator): # 'x - y'.
 
 	def _format_get_parens(self, args, fancy):
 		assert args
-		if isinstance(args[0], SeededOperator) and isinstance(args[0].unseeded_base, AddOperator):
+		if isinstance(args[0], SeededOperator) and isinstance(args[0].base, AddOperator):
 			yield str(args[0])
 			args = args[1:]
 		for arg in args:

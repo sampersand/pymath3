@@ -1,9 +1,9 @@
 from . import scrub, MathObj, ValuedObj
 class SeededFunction(ValuedObj):
 
-	def __init__(self, *, unseeded_base, call_args, **kwargs):
-		assert unseeded_base
-		self.unseeded_base = unseeded_base
+	def __init__(self, *, base, call_args, **kwargs):
+		assert base
+		self.base = base
 		self.call_args = tuple(map(scrub, call_args))
 		assert all(isinstance(arg, MathObj) for arg in self)
 		super().__init__(**kwargs)
@@ -15,10 +15,19 @@ class SeededFunction(ValuedObj):
 	def __getitem__(self, item):
 		return self.call_args[item]
 
+	base = property('the unseeded base object')
+	@base.getter
+	def base(self):
+		return self._unseeded_base
+	@base.setter
+	def base(self, value):
+		self._unseeded_base = value
+
+
 	value = ValuedObj.value
 	@value.getter
 	def value(self):
-		return self.unseeded_base.base_func(*self)
+		return self.base.base(*self)
 
 	def hasvalue(self):
 		if __debug__:
@@ -29,15 +38,15 @@ class SeededFunction(ValuedObj):
 	def __str__(self):
 		if self.hasvalue():
 			return str(self.value)
-		if not self.unseeded_base.hasname():
+		if not self.base.hasname():
 			name = '<Unnamed Function>'
 		else:
-			name = self.unseeded_base.name
+			name = self.base.name
 		return '{}({})'.format(name, ', '.join(str(x) for x in self))
 
 	def _gen_repr(self, args, kwargs):
-		assert 'unseeded_base' not in kwargs, kwargs
+		assert 'base' not in kwargs, kwargs
 		assert 'call_args' not in kwargs, kwargs
-		kwargs['unseeded_base'] = self.unseeded_base
+		kwargs['base'] = self.base
 		kwargs['call_args'] = self.call_args
 		return super()._gen_repr(args, kwargs)

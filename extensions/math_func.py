@@ -4,4 +4,4 @@ class MathFunction(UnseededFunction):
 	pass
 
 
-ln = MathFunction(base_func = math.log, name = 'ln')
+ln = MathFunction(base = math.log, name = 'ln')

@@ -2,8 +2,8 @@ from . import Operator
 class UnaryOperator(Operator):
 	SPACES = ('', '')
 
-	@Operator.base_func.getter
-	def base_func(self):
+	@Operator.base.getter
+	def base(self):
 		def capture(l):
 			assert hasattr(l, 'hasvalue')
 			assert l.hasvalue(), l

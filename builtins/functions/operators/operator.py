@@ -22,8 +22,8 @@ class Operator(UnseededFunction):
 			START = -1
 		call_args = soper.call_args
 		from . import MultiOperator
-		if isinstance(call_args[START], SeededFunction) and call_args[START].unseeded_base is soper.unseeded_base\
-			and isinstance(call_args[START].unseeded_base, MultiOperator):
+		if isinstance(call_args[START], SeededFunction) and call_args[START].base is soper.base\
+			and isinstance(call_args[START].base, MultiOperator):
 				if START == 0:
 					call_args = call_args[START].call_args + call_args[1:]
 				else:
@@ -127,7 +127,7 @@ class Operator(UnseededFunction):
 	def _needs_parens(self, other):
 		if not isinstance(other, SeededOperator):
 			return False
-		if type(other.unseeded_base) in self.paren_classes:
+		if type(other.base) in self.paren_classes:
 			if other.hasvalue():
 				return False
 			if set(str(other)) - set('0123456789-+.'):

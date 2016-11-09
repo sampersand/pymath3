@@ -5,8 +5,8 @@ class MultiOperator(Operator):
 		super().__init__(**kwargs)
 		# assert self.arglen == 2, self.arglen
 
-	@Operator.base_func.getter
-	def base_func(self):
+	@Operator.base.getter
+	def base(self):
 		def capture(*args):
 			assert all(hasattr(a, 'hasvalue') for a in args), [x for x in args if not hasattr(x, 'hasvalue')]
 			assert all(a.hasvalue() for a in args), [x for x in args if not x.hasvalue()]

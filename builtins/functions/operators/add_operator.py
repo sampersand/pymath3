@@ -21,7 +21,7 @@ class AddOperator(CommutativeOperator): # 'x + y'.
 		if fancy:
 			for arg in args:
 				if isinstance(arg, SeededOperator):
-					if isinstance(arg.unseeded_base, MulOperator):
+					if isinstance(arg.base, MulOperator):
 						if len(arg) == 2: # aka only 2*x not 2*x*y, as that's too hard
 							pass
 		return args
