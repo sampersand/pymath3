@@ -59,8 +59,8 @@ class PowOperator(NonCommutativeOperator): # 'x ** y'.
 			elif x == '+':
 				yield PowOperator.POWS[-2]
 
-	def _format_get_parens(self, args): #for giggles
-		if len(args) == 2 and args[1].hasvalue():
+	def _format_get_parens(self, args, fancy = False): #for giggles
+		if len(args) == 2 and args[1].hasvalue() and fancy:
 			b, p = args
 			p = p.value
 			assert isinstance(p, (int, float))
@@ -77,8 +77,11 @@ class PowOperator(NonCommutativeOperator): # 'x ** y'.
 
 	@staticmethod
 	def _format_weed_out(args):
-		i = 0
+		i = -1
 		while i < len(args) - 1:
+			i += 1
+			if not args[i].hasvalue():
+				continue
 			if args[i].value == 1:
 				args = args[:i]
 				break
@@ -88,8 +91,6 @@ class PowOperator(NonCommutativeOperator): # 'x ** y'.
 				else:
 					args = args[:i-1]
 					break
-			i += 1
-		print([str(x) for x in args])
 		return args
 
 		# yield from (x for x in args[1:] if not x.hasvalue() or x.value != 1)

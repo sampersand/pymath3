@@ -9,4 +9,4 @@ class AddOperator(CommutativeOperator): # 'x + y'.
 
 	@staticmethod
 	def _format_weed_out(args):
-		return (x for x in args if not x.hasvalue() or x.value != 0)
+		return tuple(x for x in args if not x.hasvalue() or x.value != 0)
