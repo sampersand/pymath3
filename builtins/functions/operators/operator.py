@@ -45,10 +45,15 @@ class Operator(UnseededFunction):
 		'''
 		args = list(args)
 
+		print('args', [str(x) for x in args], type(self).__qualname__)
 		condensed_args = list(self._format_condense(args, fancy))
+		print('condensed_args', [str(x) for x in condensed_args], type(self).__qualname__)
 		collapsed_args = list(self._format_collapse(condensed_args, fancy))
+		print('collapsed_args', [str(x) for x in collapsed_args], type(self).__qualname__)
 		conjoined_args = list(self._format_conjoin(collapsed_args, fancy))
+		print('conjoined_args', [str(x) for x in conjoined_args], type(self).__qualname__)
 		weeded_out_args = list(self._format_weed_out(conjoined_args, fancy))
+		print('weeded_out_args', [str(x) for x in weeded_out_args], type(self).__qualname__)
 		# print([str(x) for x in args])
 		ret = self._format_complete(weeded_out_args, fancy)
 		assert isinstance(ret, str), ret
@@ -67,9 +72,8 @@ class Operator(UnseededFunction):
 		while i < len(args) -1: #so doesnt conflict with +1
 			if args[i].hasvalue() and args[i+1].hasvalue():
 				toins = self(args.pop(i), args.pop(i))
-				args = args[:i] + list(toins) + args[i:]
-				i+=len(toins)+1
-
+				assert toins.hasvalue() #we're collapsing constants... they have to have a value
+				args.insert(i, toins)
 			else:
 				i += 1
 		return args

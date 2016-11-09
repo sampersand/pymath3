@@ -13,6 +13,5 @@ class CommutativeOperator(MultiOperator):
 			return 2
 		return 1
 	def _format_condense(self, args, fancy):
-
 		return sorted(args, key=self._sort_arg)
 
