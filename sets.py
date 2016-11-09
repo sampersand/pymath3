@@ -1,14 +1,19 @@
-def isa(a,b):
-	return isinstance(a,b)
-class a():
-	def __init_subclass__(self, a = 3):
+from inspect import stack
+class FooMeta(type):
+	def __prepare__(self, *args, **kwargs):
 		pass
-	pass
-class bmeta(type):
-	def __new__(cls, name, bases, attrs, **kwargs):
-		print(bases)
-		bases = (a, )
-		return super().__new__(cls, name, bases, attrs, **kwargs)
-b = bmeta('b', (), {}, a = 3)
-
-assert issubclass(type(b), bmeta)
+	def __init__(self, *args, **kwargs):
+		quit('no')
+	def __new__(self, *args, **kwargs):
+		quit('no')
+	def __init_subclass__(self, *args, **kwargs):
+		quit('no')
+print(dir(type))
+for attr in sorted(set(dir(type) ) - {'__dict__', '__doc__'}):
+	try:
+		print('{:20}: {}'.format(attr, getattr(type, attr)))
+	except AttributeError:
+		print('{:20}: {}'.format(attr, 'ERROR'))
+class foo(meta=FooMeta):
+	raise IndexError()
+	# a, b, c = 
