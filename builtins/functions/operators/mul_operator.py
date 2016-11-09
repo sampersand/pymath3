@@ -26,7 +26,7 @@ class MulOperator(CommutativeOperator): # 'x * y'.
 		return (x for x in args if not x.hasvalue() or x.value != 1)
 
 	def _get_FORMAT_JOINER(self, fancy):
-		return '*' if fancy else super()._get_FORMAT_JOINER(fancy)
+		return '' if fancy else super()._get_FORMAT_JOINER(fancy)
 
 
 
