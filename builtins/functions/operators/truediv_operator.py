@@ -24,3 +24,18 @@ class TrueDivOperator(NonCommutativeOperator): # 'x / y'.
 			return -num/(denom**2) * denom.__derive__(du)
 		else:
 			return (denom * num.__derive__(du) - num * denom.__derive__(du)) / denom ** 2
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -13,7 +13,7 @@ class SeededOperator(SeededFunction):
 		return self.base.format(self)
 
 	def __derive__(self, other):
-		return self.base.deriv_function(args = self, du = other)
+		return self.base.deriv_function(*self, du = other)
 
 
 

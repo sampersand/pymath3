@@ -43,6 +43,8 @@ class Operator(UnseededFunction):
 		-(2x, y, z)
 		2x - y - z
 		'''
+		logger.info('change Operator.format')
+		return '({}){}({})'.format(args[0], self.NAME, args[1])
 		args = list(args)
 
 		condensed_args = list(self._format_condense(args, fancy))

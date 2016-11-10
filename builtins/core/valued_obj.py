@@ -1,4 +1,4 @@
-from . import logger, Derivable
+from . import logger, Derivable, scrub
 from .operable import Operable
 from copy import deepcopy
 class ValuedObj(Operable, Derivable):
@@ -102,8 +102,7 @@ class ValuedObj(Operable, Derivable):
 
 
 	def __derive__(self, du):
-		from .constant import Constant
-		return Constant(int(not self.isconst(du)))
+		return scrub(int(not self.isconst(du)))
 
 
 __all__ = ('ValuedObj', )
