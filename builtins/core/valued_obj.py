@@ -102,7 +102,8 @@ class ValuedObj(Operable, Derivable):
 
 
 	def __derive__(self, du):
-		return int(not self.isconst(du))
+		from .constant import Constant
+		return Constant(int(not self.isconst(du)))
 
 
 __all__ = ('ValuedObj', )

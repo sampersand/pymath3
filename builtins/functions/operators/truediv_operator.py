@@ -1,4 +1,9 @@
 from . import NonCommutativeOperator, MulOperator, reduce
+def _gen_iter(a):
+	try:
+		return iter(a)
+	except TypeError:
+		return a,
 class TrueDivOperator(NonCommutativeOperator): # 'x / y'.
 	NAME = '/'
 	BASE_FUNC = staticmethod(lambda *args: reduce(lambda a, b: a / b, args))
@@ -21,11 +26,11 @@ class TrueDivOperator(NonCommutativeOperator): # 'x / y'.
 		else:
 			from . import operators
 			mul = operators['__mul__']
-			t = mul(d, *n.__derive__(du))
+			t = mul(d, *_gen_iter(n.__derive__(du)))
 			# t = d * n.__derive__(du) - n * d.__derive__(du)
 			b = d ** 2
-			print([str(x) for x in t.call_args])
-			print('du', n.__derive__(du).call_args[0])
+			# print([str(x) for x in t.call_args])
+			# print('du', n.__derive__(du).call_args[0])
 			return t / b
 		return args
 

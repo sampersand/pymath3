@@ -13,8 +13,17 @@ def getMathObj():
 
 class _system_locals(dict):
 	__slots__ = ('__globals__', )
-	BUILTIN_OBJNAMES = {'__module__', '__qualname__', '__name__', '__init_subclass__'}
+	BUILTIN_OBJNAMES = {'__module__', '__qualname__', '__name__'}
 
+	@classmethod
+	def __new__(cls, *a, **kw):
+		return super().__new__(cls)
+
+	def __init__(self, d, __globals__):
+		super().__init__(d)
+		self.__globals__ = __globals__
+		super().__setitem__('derive', SystemMeta.derive)
+		super().__setitem__('d', super().__getitem__('derive'))
 	def __setitem__(self, name, value):
 		if name in self:
 			if isinstance(self[name], getVariable()):
@@ -97,14 +106,16 @@ class SystemMeta(type):
 	def __prepare__(metacls, name, bases, *, __globals__ = None, globals_stacklevel = -1, **kwgs):
 		ret = super().__prepare__(name, bases, **kwgs)
 		__globals__ = metacls._get_globals(__globals__, globals_stacklevel)
-		metacls._insert_mathobjs(ret, __globals__)
-		ret = _system_locals(ret)
-		ret.__globals__ = __globals__
+		# metacls._insert_mathobjs(ret, __globals__)
+		ret = _system_locals(ret, __globals__)
 		return ret
 
-	@classmethod
-	def _insert_mathobjs(metacls, ret, __globals__):
-		mathobj = getMathObj()
+	@staticmethod
+	def derive(fx, dx):
+		return fx.__derive__(dx)
+	# @classmethod
+	# def _insert_mathobjs(metacls, ret, __globals__):
+	# 	mathobj = getMathObj()
 		# for name, parent in __globals__.items():
 		# 	if not isinstance(parent, type):
 		# 		continue
@@ -116,10 +127,4 @@ class SystemMeta(type):
 # 	@staticmethod
 # 	def __init_subclass__(*, __globals__, **kwargs):
 # 		pass
-
-
-
-
-
-
 
