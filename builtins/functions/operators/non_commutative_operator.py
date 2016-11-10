@@ -1,6 +1,6 @@
-from . import MultiOperator, SeededFunction
-class NonCommutativeOperator(MultiOperator):
-	pass
+from . import BinaryOperator, SeededFunction
+class NonCommutativeOperator(BinaryOperator):
+
 	@staticmethod
 	def _sort_arg(arg):
 		if __debug__:
@@ -11,5 +11,6 @@ class NonCommutativeOperator(MultiOperator):
 		if isinstance(arg, SeededFunction):
 			return 2
 		return 1
+
 	def _format_condense(self, args, fancy):
 		return [args[0]] + sorted(args[1:], key=self._sort_arg)

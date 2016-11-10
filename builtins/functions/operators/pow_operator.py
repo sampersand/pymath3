@@ -1,11 +1,14 @@
 from functools import reduce
 from . import logger
-from . import MultiOperator, import_module, NonCommutativeOperator
+from . import import_module, NonCommutativeOperator
 if __debug__:
 	from . import SeededFunction
 class PowOperator(NonCommutativeOperator): # 'x ** y'.
 	NAME = '**'
-	BASE_FUNC = staticmethod(lambda *args: reduce(lambda a, b: a ** b, args))
+
+	@staticmethod
+	def BASE_FUNC(l, r):
+		return l ** r
 
 	# @staticmethod
 	# def _weed_out(args):
@@ -15,32 +18,22 @@ class PowOperator(NonCommutativeOperator): # 'x ** y'.
 	# 	return [x for x in args if not x.hasvalue() or x.value != 1]
 
 
-	def deriv_function(self, args, du, _ln = []):
+	def deriv_function(self, b, p, *, du, _ln = []):
 		'''b**p * lnb * d(p) '''
-		assert isinstance(args, SeededFunction)
-		if __debug__:
-			logger.debug("can use 'self(*args)', but using 'args' instead as it is a SeededFunction")
-		assert len(args) == 2
 
-		b, p = args
-		consts = (b.isconst(du) << 1) + p.isconst(du)
+
+		consts = (b.isconst(du) << 1) + p.isconst(du) #wheee binary flags
 		if consts == 0b11:
 			return 0
 		elif consts == 0b10:
 			if not _ln:
 				_ln.append(import_module('pymath3.extensions').ln)
-			return args * _ln[0](b) * p.__derive__(du)
+			return (b ** p) * _ln[0](b) * p.__derive__(du)
 		elif consts == 0b01:
 			return p * b ** (p - 1) * b.__derive__(du)
 		else:
 			assert consts == 0b00 #aka neither is constant
 			raise NotImplementedError
-
-
-		ab = self(*args)
-		lna = _ln[0](args[0])
-		db = args[1].__derive__(du)
-		return ab + lna + db
 
 	POWS = ['⁰', '¹', '²', '³', '⁴', '⁵', '⁶', '⁷', '⁸', '⁹', '·', '⁺', '⁻']
 	@staticmethod

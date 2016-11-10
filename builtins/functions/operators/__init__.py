@@ -10,7 +10,7 @@ from pymath3.utils import import_module, scrub
 from .operator import Operator
 
 from .unary_operator import UnaryOperator
-from .multi_operator import MultiOperator
+from .binary_operator import BinaryOperator
 
 from .commutative_operator import CommutativeOperator
 from .non_commutative_operator import NonCommutativeOperator

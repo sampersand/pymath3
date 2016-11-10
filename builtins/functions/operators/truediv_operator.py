@@ -6,8 +6,10 @@ def _gen_iter(a):
 		return a,
 class TrueDivOperator(NonCommutativeOperator): # 'x / y'.
 	NAME = '/'
-	BASE_FUNC = staticmethod(lambda *args: reduce(lambda a, b: a / b, args))
 
+	@staticmethod
+	def BASE_FUNC(l, r):
+		return l / r
 
 	def _format_weed_out(self, args, fancy):
 		if any(arg.hasvalue() and arg.value == 0 for arg in args[1:]):
@@ -17,30 +19,8 @@ class TrueDivOperator(NonCommutativeOperator): # 'x / y'.
 			return
 		yield from (x for x in args[1:] if not x.hasvalue() or x.value != 1)
 
-	def deriv_function(self, args, du):
-		assert len(args) > 1, args
-		n = args[0]
-		d = args[1] if len(args) == 2 else self(*args[1:])
-		if n.isconst(du): #shortcut
-			return -n/(d**2) * d.__derive__(du)
+	def deriv_function(self, num, denom, *, du):
+		if num.isconst(du): #shortcut
+			return -num/(denom**2) * denom.__derive__(du)
 		else:
-			from . import operators
-			mul = operators['__mul__']
-			t = mul(d, *_gen_iter(n.__derive__(du)))
-			# t = d * n.__derive__(du) - n * d.__derive__(du)
-			b = d ** 2
-			# print([str(x) for x in t.call_args])
-			# print('du', n.__derive__(du).call_args[0])
-			return t / b
-		return args
-
-		1/x/ln(X)
-		1/(xlnx)
-		(xlnx)**-1
-		-(xlnx)^-2*(lnx + 1)
-
-
-
-
-
-
+			return (denom * num.__derive__(du) - num * denom.__derive__(du)) / denom ** 2

@@ -3,7 +3,10 @@ from . import SeededOperator
 class SubOperator(NonCommutativeOperator): # 'x - y'.
 	SPACES = AddOperator.SPACES
 	NAME = '-'
-	BASE_FUNC = staticmethod(lambda *args: reduce(lambda a, b: a - b, args))
+
+	@staticmethod
+	def BASE_FUNC(l, r):
+		return l - r
 
 	def _format_get_parens(self, args, fancy):
 		assert args

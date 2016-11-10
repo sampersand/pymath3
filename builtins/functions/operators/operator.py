@@ -15,21 +15,21 @@ class Operator(UnseededFunction):
 		return type(self).NAME
 
 
-	def _collapse_call_args(self, soper):
-		START = 0 
-		from .pow_operator import PowOperator
-		if isinstance(self, PowOperator):
-			START = -1
-		call_args = soper.call_args
-		from . import MultiOperator
-		if isinstance(call_args[START], SeededFunction) and call_args[START].base is soper.base\
-			and isinstance(call_args[START].base, MultiOperator):
-				if START == 0:
-					call_args = call_args[START].call_args + call_args[1:]
-				else:
-					assert START == -1, 'only other defined one atm'
-					call_args = call_args[:-1] + call_args[START].call_args
-		soper.call_args = call_args
+	# def _collapse_call_args(self, soper):
+	# 	START = 0 
+	# 	from .pow_operator import PowOperator
+	# 	if isinstance(self, PowOperator):
+	# 		START = -1
+	# 	call_args = soper.call_args
+	# 	from . import MultiOperator
+	# 	if isinstance(call_args[START], SeededFunction) and call_args[START].base is soper.base\
+	# 		and isinstance(call_args[START].base, MultiOperator):
+	# 			if START == 0:
+	# 				call_args = call_args[START].call_args + call_args[1:]
+	# 			else:
+	# 				assert START == -1, 'only other defined one atm'
+	# 				call_args = call_args[:-1] + call_args[START].call_args
+	# 	soper.call_args = call_args
 
 	#str functions
 

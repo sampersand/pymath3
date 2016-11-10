@@ -1,5 +1,8 @@
-from . import MultiOperator
-class MMulOperator(MultiOperator): # 'x @ y'.
+from . import BinaryOperator
+class MMulOperator(BinaryOperator): # 'x @ y'.
 	NAME = '@'
-	BASE_FUNC = staticmethod(lambda *args: reduce(lambda a, b: a @ b, args))
+
+	@staticmethod
+	def BASE_FUNC(l, r):
+		return l @ r
 

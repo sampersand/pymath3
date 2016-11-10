@@ -1,5 +1,5 @@
-from . import MultiOperator, SeededFunction
-class CommutativeOperator(MultiOperator):
+from . import BinaryOperator, SeededFunction
+class CommutativeOperator(BinaryOperator):
 	_sort_args = staticmethod(lambda args: sorted(args, key = lambda a: not a.hasvalue()))
 
 	@staticmethod
@@ -12,6 +12,7 @@ class CommutativeOperator(MultiOperator):
 		if isinstance(arg, SeededFunction):
 			return 2
 		return 1
+
 	def _format_condense(self, args, fancy):
 		return sorted(args, key=self._sort_arg)
 

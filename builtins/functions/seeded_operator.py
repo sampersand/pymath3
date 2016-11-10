@@ -7,9 +7,6 @@ class SeededOperator(SeededFunction):
 			from .operators import Operator
 			assert isinstance(self.base, Operator)
 
-		if self.call_args:
-			self.base._collapse_call_args(self)
-
 	def __str__(self):
 		if self.hasvalue():
 			return super().__str__()
