@@ -1,7 +1,6 @@
-from . import scrub, import_module, logger
+from . import scrub, import_module, logger, tq
 from inspect import stack
 Variable = None
-UserVariable = None
 MathObj = None
 def getVariable():
 	global Variable
@@ -11,13 +10,9 @@ def getMathObj():
 	global MathObj
 	MathObj = MathObj or import_module('pymath3.builtins.core.math_obj').MathObj
 	return MathObj
-def getUserVariable():
-	global UserVariable
-	UserVariable = UserVariable or import_module('pymath3.builtins.core.variable').UserVariable
-	return UserVariable
 
 class _system_locals(dict):
-	__slots__ = ()
+	__slots__ = ('__globals__', )
 	BUILTIN_OBJNAMES = {'__module__', '__qualname__', '__name__', '__init_subclass__'}
 
 	def __setitem__(self, name, value):
@@ -29,7 +24,7 @@ class _system_locals(dict):
 			super().__setitem__(name, value)
 			return
 		if name not in self:
-			if issubclass(type(value), _SystemObjMeta):
+			if 0 and issubclass(type(value), _SystemObjMeta):
 				p = value.__parent__
 				args, kwgs = value.__init_args__
 				if 'name' in kwgs:
@@ -45,27 +40,47 @@ class _system_locals(dict):
 					value.name = name
 		super().__setitem__(name, value)
 
-class _SystemObjMeta(type):
-	def __new__(cls, *args, **kwargs):
-		ret = super().__new__(cls, *args, **kwargs)
-		ret.__init_args__ = [(), {}]
-		return ret
-	def __mul__(cls, val):
-		if not isinstance(val, int):
-			return NotImplemented
-		return (cls.__parent__(*cls.__init_args__[0], **cls.__init_args__[1]) for a in range(val))
-	def __rmul__(cls, val):
-		return cls * val
 	def __getitem__(cls, item):
+		# print(item)
+		if item in cls.__globals__:
+			return cls.__globals__[item]
+		if item in dir(cls.__globals__['__builtins__']):
+			return getattr(cls.__globals__['__builtins__'], item)
+		if item not in cls:
+			cls[item] = cls['var'](name = item)
+			# super().__setitem__(item, lambda *args: print(*args))#cls['var'](name = item))
+		return super().__getitem__(item)
+		# get = super().__getitem__(item)
+		# if issubclass(type(get), _SystemObjMeta):
+			# return get.__new_instance__()
+		# return get
+# class _SystemObjMeta(type):
+# 	def __new__(cls, *args, **kwargs):
+# 		ret = super().__new__(cls, *args, **kwargs)
+# 		ret.__init_args__ = [(), {}]
+# 		return ret
 
-		if not isinstance(item, slice):
-			raise TypeError('Can only set init args by: "[" [args] ":" [kwargs] "]". not {} ({})'.format(item, type(item)))
-		if item.start is not None:
-			cls.__init_args__[0] = item.start
-		if item.stop is not None:
-			cls.__init_args__[1] = item.stop
-		return cls
+# 	def __mul__(cls, val):
+# 		if not isinstance(val, int):
+# 			return NotImplemented
+# 		return (cls.__new_instance__() for a in range(val))
 
+# 	def __rmul__(cls, val):
+# 		return cls * val
+
+# 	def __iter__(cls):
+# 		raise TypeError("'{}' object is not iterable".format(tq(cls)))
+
+# 	def __getitem__(cls, item):
+# 		if not isinstance(item, slice):
+# 			raise TypeError('Can only set init args by: "[args]:[kwargs]". not {} ({})'.format(item, type(item)))
+# 		if item.start is not None:
+# 			cls.__init_args__[0] = item.start
+# 		if item.stop is not None:
+# 			cls.__init_args__[1] = item.stop
+# 		return cls
+# 	def __new_instance__(cls):
+# 		return cls.__parent__(*cls.__init_args__[0], **cls.__init_args__[1])
 class SystemMeta(type):
 	'''
 	this class is not meant to be taken seriously (for now), and just for me to toy with
@@ -81,18 +96,20 @@ class SystemMeta(type):
 	@classmethod
 	def __prepare__(metacls, name, bases, *, __globals__ = None, globals_stacklevel = -1, **kwgs):
 		ret = super().__prepare__(name, bases, **kwgs)
-		metacls._insert_mathobjs(ret, metacls._get_globals(__globals__, globals_stacklevel))
-		return _system_locals(ret)
+		__globals__ = metacls._get_globals(__globals__, globals_stacklevel)
+		metacls._insert_mathobjs(ret, __globals__)
+		ret = _system_locals(ret)
+		ret.__globals__ = __globals__
+		return ret
 
 	@classmethod
 	def _insert_mathobjs(metacls, ret, __globals__):
 		mathobj = getMathObj()
-		for name, parent in __globals__.items():
-			if not isinstance(parent, type):
-				continue
-			if issubclass(parent, mathobj):
-				ret[name] = _SystemObjMeta(name, (), {'__parent__': parent, '__slots__': ()})
-
+		# for name, parent in __globals__.items():
+		# 	if not isinstance(parent, type):
+		# 		continue
+		# 	if issubclass(parent, mathobj):
+		# 		ret[name] = _SystemObjMeta(name, (), {'__parent__': parent, '__slots__': ()})
 
 # class System(metaclass=SystemMeta):
 
